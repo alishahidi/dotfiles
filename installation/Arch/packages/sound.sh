@@ -1,1 +1,1 @@
-sudo pacman -S pipewire pipewire-alsa pipewire-jack pipewire-docs pipewire-media-session pavucontrol alsa-utils blueberry bluez bluez-libs bluez-utils bluez-tools playerctl vlc
+sudo pacman -S pipewire pipewire-alsa pipewire-jack pipewire-docs pipewire-media-session pavucontrol playerctl alsa-firmware alsa-lib alsa-plugins alsa-tools alsa-utils blueberry bluez bluez-libs bluez-utils bluez-tools vlc
