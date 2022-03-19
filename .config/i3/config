@@ -319,7 +319,8 @@ bar {
 	}
 }
 
-bindsym $mod+x exec /home/ali/.config/base_script/ci3lock
+bindsym $mod+x exec /home/ali/.config/scripts/blur-lock
+bindsym Print exec scrot ~/%Y-%m-%d-%T-screenshot.png && notify-send "Screenshot saved to ~/$(date +"%Y-%m-%d-%T")-screenshot.png"
 
 exec xautolock -detectsleep -time 15 -locker "/home/ali/.config/base_script/ci3lock" \
   -notify 30 \
@@ -329,9 +330,14 @@ exec xautolock -detectsleep -time 15 -locker "/home/ali/.config/base_script/ci3l
 #for_window [class="Alacritty"] move to workspace $ws1
 #for_window [class="firefox"] move to workspace $ws2
 
-exec picom -f -i .95 -e .8
+exec_always --no-startup-id picom --config ~/.config/picom.conf
 exec nm-applet
 exec cbatticon
 exec volumeicon
 exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 
 exec_always --no-startup-id feh --bg-fill --randomize /home/ali/Pictures/Wallpapers/
+exec_always --no-startup-id autotiling
+exec --no-startup-id sleep 2 && alacritty
+exec --no-startup-id xfce4-clipman
+exec --no-startup-id blueberry-tray
+exec --no-startup-id dbus-launch dunst --config ~/.config/dunst/dunstrc
