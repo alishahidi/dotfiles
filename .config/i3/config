@@ -288,10 +288,10 @@ mode "$mode_gaps_left" {
 
 
 # Windows Colors
-set $bgcolor	#557B83
+set $bgcolor	#1B1A17
 set $ibgcolor	#363636
-set $fws	#557B83
-set $barcolor	#557B83
+set $fws	#1B1A17
+set $barcolor	#1B1A17
 set $textcolor	#EEEEEE
 set $itextcolor #969696
 set $ubgcolor	#FF0000
@@ -305,10 +305,10 @@ client.urgent		$ubgcolor	$ubgcolor		$textcolor	$ubgcolor
 # Start i3bar to display a workspace bar (plus the system information i3status
 bar {
 	status_command i3blocks -c /home/ali/.config/i3blocks/i3blocks.conf
-	i3bar_command i3bar --transparency 
-	#tray_output none
+	separator_symbol "|"
+	tray_output primary
 	position top
-	font pango:Inconsolata, FontAwesome5Free, FontAwesome5Brands, SymbolsNerdFont Bold 12 
+	font pango:Inconsolata, FontAwesome Bold 12 
 	colors {
 		background $barcolor
 		separator #cccccc
@@ -322,7 +322,7 @@ bar {
 bindsym $mod+x exec /home/ali/.config/scripts/blur-lock
 bindsym Print exec scrot ~/%Y-%m-%d-%T-screenshot.png && notify-send "Screenshot saved to ~/$(date +"%Y-%m-%d-%T")-screenshot.png"
 
-exec xautolock -detectsleep -time 15 -locker "/home/ali/.config/base_script/ci3lock" \
+exec xautolock -detectsleep -time 15 -locker "/home/ali/.config/scripts/blur-lockk" \
   -notify 30 \
   -notifier "notify-send -u critical -t 10000 -- 'locking screen in 30 seconds'"
 
