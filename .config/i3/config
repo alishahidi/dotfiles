@@ -288,10 +288,10 @@ mode "$mode_gaps_left" {
 
 
 # Windows Colors
-set $bgcolor	#1D2D50A6
+set $bgcolor	#557B83
 set $ibgcolor	#363636
-set $fws	#1D2D50A6
-set $barcolor	#1D2D50CC
+set $fws	#557B83
+set $barcolor	#557B83
 set $textcolor	#EEEEEE
 set $itextcolor #969696
 set $ubgcolor	#FF0000
@@ -305,7 +305,7 @@ client.urgent		$ubgcolor	$ubgcolor		$textcolor	$ubgcolor
 # Start i3bar to display a workspace bar (plus the system information i3status
 bar {
 	status_command i3blocks -c /home/ali/.config/i3blocks/i3blocks.conf
-	#i3bar_command i3bar --transparency 
+	i3bar_command i3bar --transparency 
 	#tray_output none
 	position top
 	font pango:Inconsolata, FontAwesome5Free, FontAwesome5Brands, SymbolsNerdFont Bold 12 
