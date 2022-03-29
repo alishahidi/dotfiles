@@ -14,8 +14,8 @@ bindsym XF86AudioNext exec playerctl next
 bindsym XF86AudioPrev exec playerctl previous
 
 #Brightness controls
-bindsym XF86MonBrightnessUp exec sudo /usr/bin/xbacklight -inc 5 && pkill -RTMIN+13 i3blocks
-bindsym XF86MonBrightnessDown exec sudo /usr/bin/xbacklight -dec 5 && pkill -RTMIN+13 i3blocks
+bindsym XF86MonBrightnessUp exec brightnessctl s +5% && pkill -RTMIN+13 i3blocks
+bindsym XF86MonBrightnessDown exec brightnessctl s 5%- && pkill -RTMIN+13 i3blocks
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
@@ -27,7 +27,8 @@ bindsym $mod+Return exec alacritty
 bindsym $mod+Shift+q kill
 
 # start dmenu (a program launcher)
-bindsym $mod+d exec --no-startup-id dmenu_run -b -fn "Droid Sans Regular"
+bindsym $mod+d exec --no-startup-id dmenu_run -fn "Droid Sans Regular"
+#bindsym $mod+d exec --no-startup-id dmenu_run -b -fn "Droid Sans Regular"
 #bindsym $mod+d exec ./.config/rofi/launchers/text/launcher.sh
 
 # A more modern dmenu replacement is rofi:
