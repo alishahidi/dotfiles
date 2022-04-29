@@ -161,9 +161,9 @@ bindsym $mod+r mode "resize"
 # Display Window titlebar entirely
 for_window [class="^.*"] border pixel 2
 
-# Set inner/outer gaps
-gaps inner 8
-gaps outer 2
+# Gaps (Outer gaps are added to the inner gaps)
+gaps inner 15
+gaps outer 0
 
 set $mode_gaps Gaps: (o)uter, (i)nner, (h)orizontal, (v)ertical, (t)op, (r)ight, (b)ottom, (l)eft
 set $mode_gaps_outer Outer Gaps: +|-|0 (local), Shift + +|-|0 (global)
@@ -297,11 +297,23 @@ set $textcolor	#EEEEEE
 set $itextcolor #969696
 set $ubgcolor	#FF0000
 
-#			border		background		text		indicator
-client.focused		$bgcolor	$bgcolor		$textcolor	$bgcolor
-client.unfocused	$ibgcolor	$ibgcolor		$itextcolor	$ibgcolor
-client.focused_inactive	$ibgcolor	$ibgcolor		$itextcolor	$ibgcolor
-client.urgent		$ubgcolor	$ubgcolor		$textcolor	$ubgcolor
+# #			border		background		text		indicator
+# client.focused		$bgcolor	$bgcolor		$textcolor	$bgcolor
+# client.unfocused	$ibgcolor	$ibgcolor		$itextcolor	$ibgcolor
+# client.focused_inactive	$ibgcolor	$ibgcolor		$itextcolor	$ibgcolor
+# client.urgent		$ubgcolor	$ubgcolor		$textcolor	$ubgcolor
+
+##-- Colors ------------------------------
+
+# class                 border  backgr. text    indicator child_border
+client.focused          #DA6E89 #DA6E89 #FFFFFF #98C379   #DA6E89
+client.focused_inactive #61AFEF #61AFEF #1E222A #98C379   #61AFEF
+client.unfocused        #2C3038 #2C3038 #FFFFFF #98C379   #2C3038
+client.urgent           #C678DD #C678DD #FFFFFF #98C379   #C678DD
+client.placeholder      #1E222A #1E222A #FFFFFF #98C379   #1E222A
+
+client.background       #1E222A
+
 
 # Start i3bar to display a workspace bar (plus the system information i3status
 bar {
@@ -331,14 +343,18 @@ exec xautolock -detectsleep -time 15 -locker "/home/ali/.config/scripts/blur-loc
 #for_window [class="Alacritty"] move to workspace $ws1
 #for_window [class="firefox"] move to workspace $ws2
 
-exec_always --no-startup-id picom --config ~/.config/picom.conf
-exec nm-applet
-exec cbatticon
-exec volumeicon
-exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 
-exec_always --no-startup-id feh --bg-fill --randomize /home/ali/Pictures/Wallpapers/
-exec_always --no-startup-id autotiling
-exec --no-startup-id sleep 2 && alacritty
-exec --no-startup-id xfce4-clipman
-exec --no-startup-id blueberry-tray
-exec --no-startup-id dbus-launch dunst --config ~/.config/dunst/dunstrc
+# exec_always --no-startup-id picom --config ~/.config/picom.conf
+# exec nm-applet
+# exec cbatticon
+# exec volumeicon
+# exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 
+# exec_always --no-startup-id feh --bg-fill --randomize /home/ali/Pictures/Wallpapers/
+# exec_always --no-startup-id autotiling
+# exec --no-startup-id sleep 2 && alacritty
+# exec --no-startup-id xfce4-clipman
+# exec --no-startup-id blueberry-tray
+# exec --no-startup-id dbus-launch dunst --config ~/.config/dunst/dunstrc
+
+##-- Autostart ---------------------------
+
+exec_always --no-startup-id 	~/.config/i3/bin/autostart.sh

@@ -1,1 +1,3 @@
 sudo pacman -S xorg rxvt-unicode picom nitrogen blueberry xfce4-clipman-plugin  lxappearance dmenu nautilus arandr rofi dunst pacman-contrib i3-wm i3lock i3status feh acpilight picom i3-gaps xautolock scrot brightnessctl 
+
+# paru -S acpi arandr arc-gtk-theme-eos archlinux-xdg-menu awesome-terminal-fonts dex dmenu dunst endeavouros-xfce4-terminal-colors file-roller galculator gthumb gtk-engine-murrine gvfs gvfs-afc gvfs-gphoto2 gvfs-mtp gvfs-nfs gvfs-smb i3blocks i3-gaps i3lock i3status jq lightdm lightdm-slick-greeter lxappearance-gtk3 mpv network-manager-applet nitrogen numlockx picom playerctl polkit-gnome rofi scrot sysstat thunar thunar-archive-plugin thunar-volman tumbler xbindkeys xdg-user-dirs-gtk xed xfce4-terminal xorg-xbacklight xorg-xdpyinfo
