@@ -5,7 +5,7 @@
 ## Autostart Programs
 
 # Kill already running process
-_ps=(picom dunst ksuperkey mpd xfce-polkit nm-applet volumeicon cbatticon blueberry-tray autotiling xfce4-clipman)
+_ps=(picom dunst ksuperkey nm-applet volumeicon cbatticon blueberry-tray autotiling xfce4-clipman)
 for _prs in "${_ps[@]}"; do
 	if [[ `pidof ${_prs}` ]]; then
 		killall -9 ${_prs}
@@ -16,23 +16,16 @@ done
 xsetroot -cursor_name left_ptr
 
 # Polkit agent
-/usr/lib/xfce-polkit/xfce-polkit &
+/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 
-# Enable Super Keys For Menu
-ksuperkey -e 'Super_L=Alt_L|F1' &
-ksuperkey -e 'Super_R=Alt_L|F1' &
-
-# Restore wallpaper
-hsetroot -cover ~/.config/i3/wallpapers/default.png
+# Set wallpaper
+feh --bg-fill --randomize /home/ali/Pictures/Wallpapers &
 
 # Lauch notification daemon
 ~/.config/i3/bin/i3dunst.sh
 
 # Lauch compositor
 ~/.config/i3/bin/i3comp.sh
-
-# Start mpd
-exec mpd &
 
 autotiling &
 blueberry-tray &
