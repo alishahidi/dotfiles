@@ -162,7 +162,7 @@ bindsym $mod+r mode "resize"
 for_window [class="^.*"] border pixel 2
 
 # Gaps (Outer gaps are added to the inner gaps)
-gaps inner 15
+gaps inner 10
 gaps outer 0
 
 set $mode_gaps Gaps: (o)uter, (i)nner, (h)orizontal, (v)ertical, (t)op, (r)ight, (b)ottom, (l)eft
@@ -289,28 +289,22 @@ mode "$mode_gaps_left" {
 
 
 # Windows Colors
-set $bgcolor	#1B1A17
+set $bgcolor	#1d1f21
 set $ibgcolor	#363636
-set $fws	#1B1A17
-set $barcolor	#1B1A17
+set $fws	#1d1f21
+set $barcolor	#1d1f21
 set $textcolor	#EEEEEE
 set $itextcolor #969696
 set $ubgcolor	#FF0000
 
-# #			border		background		text		indicator
-# client.focused		$bgcolor	$bgcolor		$textcolor	$bgcolor
-# client.unfocused	$ibgcolor	$ibgcolor		$itextcolor	$ibgcolor
-# client.focused_inactive	$ibgcolor	$ibgcolor		$itextcolor	$ibgcolor
-# client.urgent		$ubgcolor	$ubgcolor		$textcolor	$ubgcolor
-
 ##-- Colors ------------------------------
 
 # class                 border  backgr. text    indicator child_border
-client.focused          #DA6E89 #DA6E89 #FFFFFF #98C379   #DA6E89
-client.focused_inactive #61AFEF #61AFEF #1E222A #98C379   #61AFEF
-client.unfocused        #2C3038 #2C3038 #FFFFFF #98C379   #2C3038
-client.urgent           #C678DD #C678DD #FFFFFF #98C379   #C678DD
-client.placeholder      #1E222A #1E222A #FFFFFF #98C379   #1E222A
+client.focused          #c5c8c6 #1d1f21 #c5c8c6 #81a2be #81a2be
+client.focused_inactive #c5c8c6 #1d1f21 #c5c8c6 #5f819d #5f819d
+client.unfocused        #c5c8c6 #1d1f21 #c5c8c6 #5f819d #5f819d
+client.urgent           #c5c8c6 #1d1f21 #c5c8c6 #5f819d #5f819d
+client.placeholder      #c5c8c6 #1d1f21 #c5c8c6 #5f819d #5f819d
 
 client.background       #1E222A
 
@@ -322,14 +316,17 @@ bar {
 	tray_output primary
 	position top
 	font pango:Inconsolata, FontAwesome Bold 12 
-	colors {
-		background $barcolor
-		separator #cccccc
-		#			border		background		text
-		focused_workspace	$fws		$fws			$textcolor
-		inactive_workspace	$ibgcolor	$ibgcolor		$itextcolor
-		urgent_workspace	$ubgcolor	$ubgcolor		$textcolor
-	}
+        colors {
+                background #1d1f21
+                statusline #F8F8F2
+                separator  #c5c8c6
+
+                focused_workspace  #44475A #44475A #F8F8F2
+                active_workspace   #282A36 #44475A #F8F8F2
+                inactive_workspace #282A36 #282A36 #BFBFBF
+                urgent_workspace   #FF5555 #FF5555 #F8F8F2
+                binding_mode       #FF5555 #FF5555 #F8F8F2
+        }
 }
 
 bindsym $mod+x exec /home/ali/.config/scripts/blur-lock
@@ -338,22 +335,6 @@ bindsym Print exec scrot ~/%Y-%m-%d-%T-screenshot.png && notify-send "Screenshot
 exec xautolock -detectsleep -time 15 -locker "/home/ali/.config/scripts/blur-lockk" \
   -notify 30 \
   -notifier "notify-send -u critical -t 10000 -- 'locking screen in 30 seconds'"
-
-# Assign Programs to Workspaces
-#for_window [class="Alacritty"] move to workspace $ws1
-#for_window [class="firefox"] move to workspace $ws2
-
-# exec_always --no-startup-id picom --config ~/.config/picom.conf
-# exec nm-applet
-# exec cbatticon
-# exec volumeicon
-# exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 
-# exec_always --no-startup-id feh --bg-fill --randomize /home/ali/Pictures/Wallpapers/
-# exec_always --no-startup-id autotiling
-# exec --no-startup-id sleep 2 && alacritty
-# exec --no-startup-id xfce4-clipman
-# exec --no-startup-id blueberry-tray
-# exec --no-startup-id dbus-launch dunst --config ~/.config/dunst/dunstrc
 
 ##-- Autostart ---------------------------
 
