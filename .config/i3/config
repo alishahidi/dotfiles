@@ -300,11 +300,18 @@ set $ubgcolor	#FF0000
 ##-- Colors ------------------------------
 
 # class                 border  backgr. text    indicator child_border
-client.focused          #c5c8c6 #1d1f21 #c5c8c6 #81a2be #81a2be
-client.focused_inactive #c5c8c6 #1d1f21 #c5c8c6 #5f819d #5f819d
-client.unfocused        #c5c8c6 #1d1f21 #c5c8c6 #5f819d #5f819d
-client.urgent           #c5c8c6 #1d1f21 #c5c8c6 #5f819d #5f819d
-client.placeholder      #c5c8c6 #1d1f21 #c5c8c6 #5f819d #5f819d
+# client.focused          #c5c8c6 #1d1f21 #c5c8c6 #81a2be #81a2be
+# client.focused_inactive #c5c8c6 #1d1f21 #c5c8c6 #5f819d #5f819d
+# client.unfocused        #c5c8c6 #1d1f21 #c5c8c6 #5f819d #5f819d
+# client.urgent           #c5c8c6 #1d1f21 #c5c8c6 #5f819d #5f819d
+# client.placeholder      #c5c8c6 #1d1f21 #c5c8c6 #5f819d #5f819d
+
+client.focused          #6272A4 #6272A4 #F8F8F2 #6272A4   #F8F8F2
+client.focused_inactive #44475A #44475A #F8F8F2 #44475A   #44475A
+client.unfocused        #282A36 #282A36 #BFBFBF #282A36   #282A36
+client.urgent           #44475A #FF5555 #F8F8F2 #FF5555   #FF5555
+client.placeholder      #282A36 #282A36 #F8F8F2 #282A36   #282A36
+
 
 client.background       #1E222A
 
