@@ -32,21 +32,12 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-dracula
-      doom-font (font-spec :family "Source Code Pro" :size 16)
-      doom-variable-pitch-font (font-spec :family "Ubuntu" :size 16)
-      doom-big-font (font-spec :family "Source Code Pro" :size 24))
-;;(setq doom-theme 'doom-dracula
-;;      doom-font (font-spec :family "Mononoki Nerd Font" :size 17)
-;;      doom-variable-pitch-font (font-spec :family "Ubuntu" :size 17)
-;;      doom-big-font (font-spec :family "Source Code Pro" :size 24))
-(after! doom-themes
-  (setq doom-theme-enable-bold t
-        doom-theme-enable-italic t))
+(setq doom-theme 'doom-dracula)
 
-(custom-set-faces!
- '(font-lock-comment-face :slant italic)
- '(font-lock-keyword-face :slant italic))
+(setq doom-font (font-spec :family "Source Code Pro" :size 15)
+      doom-variable-pitch-font (font-spec :family "Ubuntu" :size 15)
+      doom-big-font (font-spec :family "Source Code Pro" :size 24))
+
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
@@ -54,8 +45,13 @@
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/org/")
-
-
+(after! doom-themes
+  (setq doom-theme-enable-bold t
+        doom-theme-enable-italic t))
+;;(setq doom-neotree-file-icons t)
+;;(setq neo-theme 'icons)
+;;(doom-themes-neotree-config)
+;;(setq doom-themes-neotree-file-icons t)
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
@@ -87,9 +83,12 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
-(setq doom-neotree-file-icons t)
-(setq neo-theme 'icons)
-(doom-themes-neotree-config)
-(setq doom-themes-neotree-file-icons t)
-(setq browse-url-browser-function 'browse-url-generic
-      browse-url-generic-program "qutebrowser")
+
+(add-hook 'python-mode-hook 'jedi:setup)
+(setq jedi:complete-on-dot t)                 ; optional
+(setq fancy-splash-image "~/.doom.d/emacs-e.svg")
+(setq minimap-window-location 'right)
+(map! :leader
+      (:prefix ("t" . "toggle")
+       :desc "Toggle minimap-mode" "m" #'minimap-mode))
+(global-visual-line-mode t)
