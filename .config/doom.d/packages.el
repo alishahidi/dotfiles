@@ -66,6 +66,7 @@
 (package! ivy-posframe)
 (package! mw-thesaurus)
 (package! org-board)
+(package! org-roam)
 (package! org-web-tools)
 (package! ox-gemini)
 (package! pacmacs)
