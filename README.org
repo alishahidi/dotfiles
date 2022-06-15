@@ -1,0 +1,8 @@
+#+TITLE: Ali Shahidi's dotfiles
+#+AUTHOR: Ali Shahidi
+#+DESCRIPTION: Ali Shahidi's personal dotfiles.
+#+OPTIONS: num:nil ^:{}
+
+* What is this
+
+This is my own dotfiles. I created this repository to save my changes and configurations. You can improve your configurations by get helps from this repository.
