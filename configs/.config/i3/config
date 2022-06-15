@@ -338,7 +338,7 @@ bar {
 
 bindsym $mod+x exec /home/ali/.config/scripts/blur-lock
 bindsym Print exec scrot ~/%Y-%m-%d-%T-screenshot.png && notify-send "Screenshot saved to ~/$(date +"%Y-%m-%d-%T")-screenshot.png"
-
+bindsym $mod+Shift+w exec feh --bg-fill --randomize /home/ali/Pictures/Wallpapers
 exec xautolock -detectsleep -time 15 -locker "/home/ali/.config/scripts/blur-lock" \
   -notify 30 \
   -notifier "notify-send -u critical -t 10000 -- 'locking screen in 30 seconds'"

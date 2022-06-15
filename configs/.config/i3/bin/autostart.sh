@@ -32,5 +32,4 @@ blueberry-tray &
 cbatticon &
 volumeicon &
 xfce4-clipman &
-sleep 2 && alacritty &
 nm-applet &
