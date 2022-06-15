@@ -1,0 +1,1427 @@
+#+TITLE: Ali Shahidi GNU Emacs Config
+#+AUTHOR: Ali SHahidi
+#+DESCRIPTION: Ali Shahidi personal Emacs config.
+#+OPTIONS: num:nil ^:{}
+
+* About this config
+This is my emacs config
+
+I got help from daviwil dotfiles [[https://config.daviwil.com/emacs][link]] & Derek Taylor(dt) dotfiles [[https://gitlab.com/dwt1/dotfiles][link]]
+I made custom changes to existing configurations to configure emacs as I liked
+
+* Important!
+If you want load configs from org file into el file you must add this code to your init.el file
+
+#+begin_example
+
+(org-babel-load-file
+(expand-file-name
+  "config.org"
+  user-emacs-directory))
+
+#+end_example
+
+* Performance
+
+** Startup
+
+#+begin_src emacs-lisp
+
+;; The default is 800 kilobytes.  Measured in bytes.
+(setq gc-cons-threshold (* 50 1000 1000))
+
+;; Profile emacs startup
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (message "*** Emacs loaded in %s seconds with %d garbage collections."
+                     (emacs-init-time "%.2f")
+                     gcs-done)))
+
+#+end_src
+
+** Native Compilation
+
+#+begin_src emacs-lisp
+
+;; Silence compiler warnings as they can be pretty disruptive
+(setq native-comp-async-report-warnings-errors nil)
+
+#+end_src
+
+** Exit
+
+#+begin_src emacs-lisp
+
+;; fix xclip problem on emacs quit
+(setq x-select-enable-clipboard-manager nil)
+
+#+end_src
+
+* Package Management
+
+/Sometimes when you install the package, you will encounter a 404 error. To solve this problem, you must use =M-x lisp-packages= for fix this/
+
+** Basic
+
+#+begin_src emacs-lisp
+
+;; Initialize package sources
+(require 'package)
+
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("org" . "https://orgmode.org/elpa/")
+                         ("elpa" . "https://elpa.gnu.org/packages/")))
+
+(package-initialize)
+(unless package-archive-contents
+  (package-refresh-contents))
+
+  ;; Initialize use-package on non-Linux platforms
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+
+(require 'use-package)
+(setq use-package-always-ensure t)
+
+#+end_src
+
+** straight
+
+#+begin_src emacs-lisp
+
+;; Bootstrap straight.el
+(defvar bootstrap-version)
+(let ((bootstrap-file
+      (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+        "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+        'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+;; Always use straight to install on systems other than Linux
+(setq straight-use-package-by-default (not (eq system-type 'gnu/linux)))
+
+;; Use straight.el for use-package expressions
+(straight-use-package 'use-package)
+
+;; Load the helper package for commands like `straight-x-clean-unused-repos'
+(require 'straight-x)
+
+#+end_src
+
+* Kepp .emacs.d Clean
+
+#+begin_src emacs-lisp
+
+;; Change the user-emacs-directory to keep unwanted things out of ~/.emacs.d
+(setq user-emacs-directory (expand-file-name "~/.cache/emacs/")
+      url-history-file (expand-file-name "url/history" user-emacs-directory))
+
+;; Use no-littering to automatically set common paths to the new user-emacs-directory
+(use-package no-littering)
+
+;; Keep customization settings in a temporary file (thanks Ambrevar!)
+(setq custom-file
+      (if (boundp 'server-socket-dir)
+          (expand-file-name "custom.el" server-socket-dir)
+        (expand-file-name (format "emacs-custom-%s.el" (user-uid)) temporary-file-directory)))
+(load custom-file t)
+
+#+end_src
+
+* Default Coding System
+
+#+begin_src emacs-lisp
+
+(set-default-coding-systems 'utf-8)
+
+#+end_src
+
+* Keyboard Bindings
+
+** ESC Cancels All
+
+#+begin_src emacs-lisp
+
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+#+end_src
+
+** Rebind C-u
+
+Since I let evil-mode take over C-u for buffer scrolling, I need to re-bind the universal-argument command to another key sequence. I'm choosing C-M-u for this purpose.
+
+#+begin_src emacs-lisp
+
+(global-set-key (kbd "C-M-u") 'universal-argument)
+
+#+end_src
+
+
+** Evil Mode
+
+#+begin_src emacs-lisp
+
+(defun apts/evil-hook ()
+  (dolist (mode '(custom-mode
+                  eshell-mode
+                  git-rebase-mode
+                  erc-mode
+                  circe-server-mode
+                  circe-chat-mode
+                  circe-query-mode
+                  sauron-mode
+                  term-mode))
+  (add-to-list 'evil-emacs-state-modes mode)))
+
+(defun apts/dont-arrow-me-bro ()
+  (interactive)
+  (message "Arrow keys are bad, you know?"))
+
+(use-package undo-tree
+  :init
+  (global-undo-tree-mode 1))
+
+(use-package evil
+  :init
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
+  (setq evil-want-C-u-scroll t)
+  (setq evil-want-C-i-jump nil)
+  (setq evil-respect-visual-line-mode t)
+  (setq evil-undo-system 'undo-tree)
+  :config
+  (add-hook 'evil-mode-hook 'apts/evil-hook)
+  (evil-mode 1)
+  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+  (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+
+  ;; Use visual line motions even outside of visual-line-mode buffers
+  (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+  (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+
+  ;; Disable arrow keys in normal and visual modes
+  (define-key evil-normal-state-map (kbd "<left>") 'apts/dont-arrow-me-bro)
+  (define-key evil-normal-state-map (kbd "<right>") 'apts/dont-arrow-me-bro)
+  (define-key evil-normal-state-map (kbd "<down>") 'apts/dont-arrow-me-bro)
+  (define-key evil-normal-state-map (kbd "<up>") 'apts/dont-arrow-me-bro)
+  (evil-global-set-key 'motion (kbd "<left>") 'apts/dont-arrow-me-bro)
+  (evil-global-set-key 'motion (kbd "<right>") 'apts/dont-arrow-me-bro)
+  (evil-global-set-key 'motion (kbd "<down>") 'apts/dont-arrow-me-bro)
+  (evil-global-set-key 'motion (kbd "<up>") 'apts/dont-arrow-me-bro)
+
+  (evil-set-initial-state 'messages-buffer-mode 'normal)
+  (evil-set-initial-state 'dashboard-mode 'normal))
+
+(use-package evil-collection
+  :after evil
+  :init
+  (setq evil-collection-company-use-tng nil)  ;; Is this a bug in evil-collection?
+  :custom
+  (evil-collection-outline-bind-tab-p nil)
+  :config
+  (setq evil-collection-mode-list
+        (remove 'lispy evil-collection-mode-list))
+  (evil-collection-init))
+
+#+end_src
+
+** Keybinding Panel (which-key)
+
+#+begin_src emacs-lisp
+
+(use-package which-key
+  :init (which-key-mode)
+  :diminish which-key-mode
+  :config
+  (setq which-key-idle-delay 0.3))
+
+#+end_src
+
+** Leader Key
+
+#+begin_src emacs-lisp
+
+(use-package general
+  :config
+  (general-evil-setup t)
+
+  (general-create-definer apts/leader-key-def
+    :keymaps '(normal insert visual emacs)
+    :prefix "SPC"
+    :global-prefix "C-SPC")
+
+  (general-create-definer apts/ctrl-c-keys
+    :prefix "C-c"))
+
+#+end_src
+
+** Enable keychord bind with use-package
+
+#+begin_src emacs-lisp
+
+(use-package use-package-chords
+  :config (key-chord-mode 1))
+
+#+end_src
+
+* General Configuration
+
+** Emacs Interface
+
+*** clean emacs interface for make it minimal
+
+#+begin_src emacs-lisp
+
+(setq inhibit-startup-message t)
+
+(scroll-bar-mode -1)        ; Disable visible scrollbar
+(tool-bar-mode -1)          ; Disable the toolbar
+(tooltip-mode -1)           ; Disable tooltips
+(set-fringe-mode 10)        ; Give some breathing room
+
+(menu-bar-mode -1)            ; Disable the menu bar
+
+;; Set up the visible bell
+(setq visible-bell t)
+
+#+end_src
+
+*** improve and fix scrolling
+
+#+begin_src emacs-lisp
+
+(setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
+(setq use-dialog-box nil) ;; Disable dialog boxes since they weren't working in Mac OSX
+(setq scroll-conservatively 101) ;; value greater than 100 gets rid of half page jumping
+(setq mouse-wheel-scroll-amount '(3 ((shift) . 3))) ;; how many lines at a time
+(setq mouse-wheel-progressive-speed nil) ;; dont accelerate scrolling
+
+#+end_src
+
+*** Set frame transparency
+
+#+begin_src emacs-lisp
+
+(set-frame-parameter (selected-frame) 'alpha '(90 . 90))
+(add-to-list 'default-frame-alist '(alpha . (90 . 90)))
+
+#+end_src
+
+*** Enable line number
+
+#+begin_src emacs-lisp
+
+(column-number-mode)
+
+;; Enable line numbers for some modes
+(dolist (mode '(text-mode-hook
+                prog-mode-hook
+                conf-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 1))))
+
+;; Override some modes which derive from the above
+(dolist (mode '(org-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+#+end_src
+
+*** Don't warn for large files
+
+#+begin_src emacs-lisp
+
+(setq large-file-warning-threshold nil)
+
+#+end_src
+
+*** Don't warn for following symlinked files
+
+#+begin_src emacs-lisp
+
+(setq vc-follow-symlinks t)
+
+#+end_src
+
+*** Don't warn when advice is added for functions
+
+#+begin_src emacs-lisp
+
+(setq ad-redefinition-action 'accept)
+
+#+end_src
+
+*** Theme configs
+
+#+begin_src emacs-lisp
+
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
+
+
+(use-package rainbow-mode
+  :defer t
+  :hook (org-mode
+         emacs-lisp-mode))
+
+(use-package spacegray-theme)
+(use-package doom-themes)
+(load-theme 'doom-palenight t)
+(doom-themes-visual-bell-config)
+
+#+end_src
+
+*** Fonts
+
+**** Base system font configuration
+
+#+begin_src emacs-lisp
+
+(set-face-attribute 'default nil
+                    :font "fantasque sans mono Nerd Font"
+                    :weight 'regular
+                    :height 138)
+
+;; Set the fixed pitch face
+(set-face-attribute 'fixed-pitch nil
+                    :font "fantasque sans mono Nerd Font"
+                    :weight 'medium
+                    :height 138)
+
+;; Set the variable pitch face
+(set-face-attribute 'variable-pitch nil
+                    ;; :font "Cantarell"
+                    :font "fantasque sans mono Nerd Font"
+                    :height 138
+                    :weight 'regular)
+
+#+end_src
+
+**** Enable proper Unicode glyph support
+
+#+begin_src emacs-lisp
+
+(defun apts/replace-unicode-font-mapping (block-name old-font new-font)
+  (let* ((block-idx (cl-position-if
+                         (lambda (i) (string-equal (car i) block-name))
+                         unicode-fonts-block-font-mapping))
+         (block-fonts (cadr (nth block-idx unicode-fonts-block-font-mapping)))
+         (updated-block (cl-substitute new-font old-font block-fonts :test 'string-equal)))
+    (setf (cdr (nth block-idx unicode-fonts-block-font-mapping))
+          `(,updated-block))))
+
+(use-package unicode-fonts
+  :custom
+  (unicode-fonts-skip-font-groups '(low-quality-glyphs))
+  :config
+  ;; Fix the font mappings to use the right emoji font
+  (mapcar
+    (lambda (block-name)
+      (apts/replace-unicode-font-mapping block-name "Apple Color Emoji" "Noto Color Emoji"))
+    '("Dingbats"
+      "Emoticons"
+      "Miscellaneous Symbols and Pictographs"
+      "Transport and Map Symbols"))
+  (unicode-fonts-setup))
+
+#+end_src
+
+
+**** Emojis in buffers
+
+#+begin_src emacs-lisp
+
+(use-package emojify
+  :hook (erc-mode . emojify-mode)
+  :commands emojify-mode)
+
+#+end_src
+
+*** Mode Line
+
+**** Basic Customization
+
+#+begin_src emacs-lisp
+
+(setq display-time-format "%l:%M %p %b %y"
+      display-time-default-load-average nil)
+
+#+end_src
+
+**** Enable Mode Diminishing
+
+The diminish package hides pesky minor modes from the modelines.
+
+#+begin_src emacs-lisp
+
+(use-package diminish)
+
+#+end_src
+
+**** Doom Modeline
+
+/You must run =M-X all-the-icons-install-fonts= one time after install all-the-icons package/
+
+#+begin_src emacs-lisp
+
+(use-package all-the-icons
+  :if (display-graphic-p))
+
+(use-package minions
+  :hook (doom-modeline-mode . minions-mode))
+
+(use-package doom-modeline
+  :hook (after-init . doom-modeline-init)
+	:init (doom-modeline-mode 1)
+  :custom
+  (doom-modeline-height 25)
+  (doom-modeline-bar-width 6)
+  (doom-modeline-lsp t)
+  (doom-modeline-github nil)
+  (doom-modeline-mu4e nil)
+  (doom-modeline-irc nil)
+  (doom-modeline-minor-modes t)
+  (doom-modeline-persp-name nil)
+  (doom-modeline-buffer-file-name-style 'truncate-except-project)
+  (doom-modeline-major-mode-icon nil))
+
+#+end_src
+
+*** Auto-Saving Changed Files
+
+#+begin_src emacs-lisp
+
+(use-package super-save
+  :defer 1
+  :diminish super-save-mode
+  :config
+  (super-save-mode +1)
+  (setq super-save-auto-save-when-idle t))
+
+#+end_src
+
+*** Auto-Reverting Changed Files
+
+#+begin_src emacs-lisp
+
+;; Revert Dired and other buffers
+(setq global-auto-revert-non-file-buffers t)
+
+;; Revert buffers when the underlying file has changed
+(global-auto-revert-mode 1)
+
+#+end_src
+
+*** UI Toggles
+
+#+begin_src emacs-lisp
+
+(apts/leader-key-def
+  "t"  '(:ignore t :which-key "toggles")
+  "tw" 'whitespace-mode
+  "tt" '(counsel-load-theme :which-key "choose theme"))
+
+#+end_src
+
+*** Highlight Matching Braces
+
+#+begin_src emacs-lisp
+
+(use-package paren
+  :config
+  (set-face-attribute 'show-paren-match-expression nil :background "#363e4a")
+  (show-paren-mode 1))
+
+#+end_src
+
+*** Dashboard
+
+#+begin_src emacs-lisp
+
+(use-package dashboard
+  :init      ;; tweak dashboard config before loading it
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+  (setq dashboard-startup-banner "~/.emacs.d/banner.png")  ;; use custom image as banner
+  (setq dashboard-center-content nil) ;; set to 't' for centered content
+  (setq dashboard-items '((recents . 5)
+                          (agenda . 5 )
+                          (bookmarks . 5)
+                          (projects . 5)
+                          (registers . 5)))
+  :config
+  (dashboard-setup-startup-hook)
+  (dashboard-modify-heading-icons '((recents . "file-text")
+                                    (bookmarks . "book"))))
+
+#+end_src
+
+* Editing Configuration
+
+** Tab Widths
+
+#+begin_src emacs-lisp
+
+(setq-default tab-width 2)
+(setq-default evil-shift-width tab-width)
+
+#+end_src
+
+** Commenting Lines
+
+*Use =M-*/= For Fast Commenting*
+
+#+begin_src emacs-lisp
+
+(use-package evil-nerd-commenter
+  :bind ("M-/" . evilnc-comment-or-uncomment-lines))
+
+#+end_src
+
+** Automatically clean whitespace
+
+#+begin_src emacs-lisp
+
+(use-package ws-butler
+  :hook ((text-mode . ws-butler-mode)
+         (prog-mode . ws-butler-mode)))
+
+#+end_src
+
+** Use Parinfer for Lispy languages
+
+#+begin_src emacs-lisp
+
+(use-package parinfer
+  :disabled
+  :hook ((clojure-mode . parinfer-mode)
+         (emacs-lisp-mode . parinfer-mode)
+         (common-lisp-mode . parinfer-mode)
+         (scheme-mode . parinfer-mode)
+         (lisp-mode . parinfer-mode))
+  :config
+  (setq parinfer-extensions
+      '(defaults       ; should be included.
+        pretty-parens  ; different paren styles for different modes.
+        evil           ; If you use Evil.
+        smart-tab      ; C-b & C-f jump positions and smart shift with tab & S-tab.
+        smart-yank)))  ; Yank behavior depend on mode.
+
+(apts/leader-key-def
+  "tp" 'parinfer-toggle-mode)
+
+#+end_src
+
+** Origami for Folding
+
+#+begin_src emacs-lisp
+
+(use-package origami
+  :hook (yaml-mode . origami-mode))
+
+#+end_src
+
+* Configuration Files
+
+** Helpers
+
+#+begin_src emacs-lisp
+
+(defun apts/org-file-jump-to-heading (org-file heading-title)
+  (interactive)
+  (find-file (expand-file-name org-file))
+  (goto-char (point-min))
+  (search-forward (concat "* " heading-title))
+  (org-overview)
+  (org-reveal)
+  (org-show-subtree)
+  (forward-line))
+
+(defun apts/org-file-show-headings (org-file)
+  (interactive)
+  (find-file (expand-file-name org-file))
+  (counsel-org-goto)
+  (org-overview)
+  (org-reveal)
+  (org-show-subtree)
+  (forward-line))
+
+#+end_src
+
+** Bindings
+
+#+begin_src emacs-lisp
+
+(apts/leader-key-def
+  "f"  '(:ignore t :which-key "find dotfiles")
+  "fi" '((lambda () (interactive) (find-file "~/.config/i3/config")) :which-key "i3 config")
+  "fe" '((lambda () (interactive) (apts/org-file-show-headings "~/.emacs.d/config.org")) :which-key "edit emacs org config"))
+
+#+end_src
+
+* Stateful Keymaps with Hydra
+
+#+begin_src emacs-lisp
+
+(use-package hydra
+  :defer 1)
+
+#+end_src
+
+* Better Completions with Ivy
+
+#+begin_src emacs-lisp
+
+(use-package swiper :ensure t)
+
+;; ivy configs
+(use-package ivy
+  :diminish
+  :bind (("C-s" . swiper)
+         :map ivy-minibuffer-map
+         ("TAB" . ivy-alt-done)
+         ("C-f" . ivy-alt-done)
+         ("C-l" . ivy-alt-done)
+         ("C-j" . ivy-next-line)
+         ("C-k" . ivy-previous-line)
+         :map ivy-switch-buffer-map
+         ("C-k" . ivy-previous-line)
+         ("C-l" . ivy-done)
+         ("C-d" . ivy-switch-buffer-kill)
+         :map ivy-reverse-i-search-map
+         ("C-k" . ivy-previous-line)
+         ("C-d" . ivy-reverse-i-search-kill))
+  :init
+  (ivy-mode 1)
+  :config
+  (setq ivy-use-virtual-buffers t)
+  (setq ivy-wrap t)
+  (setq ivy-count-format "(%d/%d) ")
+  (setq enable-recursive-minibuffers t)
+
+  ;; Use different regex strategies per completion command
+  (push '(completion-at-point . ivy--regex-fuzzy) ivy-re-builders-alist) ;; This doesn't seem to work...
+  (push '(swiper . ivy--regex-ignore-order) ivy-re-builders-alist)
+  (push '(counsel-M-x . ivy--regex-ignore-order) ivy-re-builders-alist)
+
+  ;; Set minibuffer height for different commands
+  (setf (alist-get 'counsel-projectile-ag ivy-height-alist) 15)
+  (setf (alist-get 'counsel-projectile-rg ivy-height-alist) 15)
+  (setf (alist-get 'swiper ivy-height-alist) 15)
+  (setf (alist-get 'counsel-switch-buffer ivy-height-alist) 7))
+
+(use-package ivy-hydra
+  :defer t
+  :after hydra)
+
+(use-package ivy-rich
+  :init
+  (ivy-rich-mode 1)
+  :after counsel
+  :config
+  (setq ivy-format-function #'ivy-format-function-line)
+  (setq ivy-rich-display-transformers-list
+        (plist-put ivy-rich-display-transformers-list
+                   'ivy-switch-buffer
+                   '(:columns
+                     ((ivy-rich-candidate (:width 40))
+                      (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right)); return the buffer indicators
+                      (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))          ; return the major mode info
+                      (ivy-rich-switch-buffer-project (:width 15 :face success))             ; return project name using `projectile'
+                      (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))  ; return file path relative to project root or `default-directory' if project is nil
+                     :predicate
+                     (lambda (cand)
+                       (if-let ((buffer (get-buffer cand)))
+                           ;; Don't mess with EXWM buffers
+                           (with-current-buffer buffer
+                             (not (derived-mode-p 'exwm-mode)))))))))
+
+(use-package counsel
+  :demand t
+  :bind (("M-x" . counsel-M-x)
+         ("C-x b" . counsel-ibuffer)
+         ("C-x C-f" . counsel-find-file)
+         ;; ("C-M-j" . counsel-switch-buffer)
+         ("C-M-l" . counsel-imenu)
+         :map minibuffer-local-map
+         ("C-r" . 'counsel-minibuffer-history))
+  :custom
+  (counsel-linux-app-format-function #'counsel-linux-app-format-function-name-only)
+  :config
+  (setq ivy-initial-inputs-alist nil)) ;; Don't start searches with ^
+
+
+(use-package flx  ;; Improves sorting for fuzzy-matched results
+  :after ivy
+  :defer t
+  :init
+  (setq ivy-flx-limit 10000))
+
+(use-package wgrep)
+
+(use-package ivy-posframe
+	:disabled
+  :custom
+  (ivy-posframe-width      115)
+  (ivy-posframe-min-width  115)
+  (ivy-posframe-height     10)
+  (ivy-posframe-min-height 10)
+  :config
+  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
+  (setq ivy-posframe-parameters '((parent-frame . nil)
+                                  (left-fringe . 8)
+                                  (right-fringe . 8)))
+  (ivy-posframe-mode 1))
+
+(use-package prescient
+  :after counsel
+  :config
+  (prescient-persist-mode 1))
+
+(use-package ivy-prescient
+  :after prescient
+  :config
+  (ivy-prescient-mode 1))
+
+(apts/leader-key-def
+  "r"   '(ivy-resume :which-key "ivy resume")
+  "f"   '(:ignore t :which-key "files")
+  "ff"  '(counsel-find-file :which-key "open file")
+  "C-f" 'counsel-find-file
+  "fr"  '(counsel-recentf :which-key "recent files")
+  "fR"  '(revert-buffer :which-key "revert file")
+  "fj"  '(counsel-file-jump :which-key "jump to file"))
+
+#+end_src
+
+* Completion System
+
+** Preserve Minibuffer History with savehist-mode
+
+#+begin_src emacs-lisp
+
+(use-package savehist
+  :config
+  (setq history-length 25)
+  (savehist-mode 1))
+
+#+end_src
+
+** Completions with Vertico
+
+#+begin_src emacs-lisp
+
+(defun apts/minibuffer-backward-kill (arg)
+  "When minibuffer is completing a file name delete up to parent
+folder, otherwise delete a word"
+  (interactive "p")
+  (if minibuffer-completing-file-name
+      ;; Borrowed from https://github.com/raxod502/selectrum/issues/498#issuecomment-803283608
+      (if (string-match-p "/." (minibuffer-contents))
+          (zap-up-to-char (- arg) ?/)
+        (delete-minibuffer-contents))
+      (backward-kill-word arg)))
+
+(use-package vertico
+  :straight '(vertico :host github
+                      :repo "minad/vertico"
+                      :branch "main")
+  :bind (:map vertico-map
+         ("C-j" . vertico-next)
+         ("C-k" . vertico-previous)
+         ("C-f" . vertico-exit)
+         :map minibuffer-local-map
+         ("M-h" . apts/minibuffer-backward-kill))
+  :custom
+  (vertico-cycle t)
+  :custom-face
+  (vertico-current ((t (:background "#3a3f5a"))))
+  :init
+  (vertico-mode))
+
+#+end_src
+
+** Completions in Regions with Corfu
+
+#+begin_src emacs-lisp
+
+(use-package corfu
+  :straight '(corfu :host github
+                    :repo "minad/corfu")
+  :bind (:map corfu-map
+         ("C-j" . corfu-next)
+         ("C-k" . corfu-previous)
+         ("C-f" . corfu-insert))
+  :custom
+  (corfu-cycle t)
+  :config
+  (corfu-global-mode))
+
+#+end_src
+
+** Improved Candidate Filtering with Orderless
+
+#+begin_src emacs-lisp
+
+(use-package orderless
+  :straight t
+  :init
+  (setq completion-styles '(orderless)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles . (partial-completion))))))
+
+#+end_src
+
+** Consult Commands
+
+#+begin_src emacs-lisp
+
+(defun apts/get-project-root ()
+  (when (fboundp 'projectile-project-root)
+    (projectile-project-root)))
+
+(use-package consult
+  :straight t
+  :demand t
+  :bind (("C-s" . consult-line)
+         ("C-M-l" . consult-imenu)
+         ("C-M-j" . persp-switch-to-buffer*)
+         :map minibuffer-local-map
+         ("C-r" . consult-history))
+  :custom
+  (consult-project-root-function #'apts/get-project-root)
+  (completion-in-region-function #'consult-completion-in-region))
+
+#+end_src
+
+** Completion Annotations with Marginalia
+
+#+begin_src emacs-lisp
+
+
+(use-package marginalia
+  :after vertico
+  :straight t
+  :custom
+  (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
+  :init
+  (marginalia-mode))
+
+#+end_src
+
+** Completion Actions with Embark
+
+#+begin_src emacs-lisp
+
+(use-package embark
+  :straight t
+  :bind (("C-S-a" . embark-act)
+         :map minibuffer-local-map
+         ("C-d" . embark-act))
+  :config
+
+  ;; Show Embark actions via which-key
+  (setq embark-action-indicator
+        (lambda (map)
+          (which-key--show-keymap "Embark" map nil nil 'no-paging)
+          #'which-key--hide-popup-ignore-command)
+        embark-become-indicator embark-action-indicator))
+
+#+end_src
+
+* Jumping with Avy
+
+#+begin_src emacs-lisp
+
+(use-package avy
+  :commands (avy-goto-char avy-goto-word-0 avy-goto-line))
+
+(apts/leader-key-def
+  "j"   '(:ignore t :which-key "jump")
+  "jj"  '(avy-goto-char :which-key "jump to char")
+  "jw"  '(avy-goto-word-0 :which-key "jump to word")
+  "jl"  '(avy-goto-line :which-key "jump to line"))
+
+#+end_src
+
+
+* Window Management
+
+** Frame Scaling / Zooming
+
+The keybindings for this are =C+M += and =C+M +=.
+
+#+begin_src emacs-lisp
+
+(use-package default-text-scale
+  :defer 1
+  :config
+  (default-text-scale-mode))
+
+#+end_src
+
+** Window Selection with ace-window
+
+ace-window helps with easily switching between windows based on a predefined set of keys used to identify each.
+
+#+begin_src emacs-lisp
+
+(use-package ace-window
+  :bind (("M-o" . ace-window))
+  :custom
+  (aw-scope 'frame)
+  (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+  (aw-minibuffer-flag t)
+  :config
+  (ace-window-display-mode 1))
+
+#+end_src
+
+*** Window History with winner-mode
+
+#+begin_src emacs-lisp
+
+(use-package winner
+  :after evil
+  :config
+  (winner-mode)
+  (define-key evil-window-map "u" 'winner-undo)
+  (define-key evil-window-map "U" 'winner-redo))
+
+#+end_src
+
+
+** Set Margins for Modes
+
+#+begin_src emacs-lisp
+
+(defun apts/org-mode-visual-fill ()
+  (setq visual-fill-column-width 110
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :defer t
+  :hook (org-mode . apts/org-mode-visual-fill))
+
+#+end_src
+
+** Control Buffer Placement
+
+Emacs' default buffer placement algorithm is pretty disruptive if you like setting up window layouts a certain way in your workflow. The display-buffer-alist video controls this behavior and you can customize it to prevent Emacs from popping up new windows when you run commands.
+
+#+begin_src emacs-lisp
+
+(setq display-buffer-base-action
+      '(display-buffer-reuse-mode-window
+        display-buffer-reuse-window
+        display-buffer-same-window))
+
+;; If a popup does happen, don't resize windows to be equal-sized
+(setq even-window-sizes nil)
+
+#+end_src
+
+* Expand Region
+
+#+begin_src emacs-lisp
+
+(use-package expand-region
+  :bind (("M-[" . er/expand-region)
+         ("C-(" . er/mark-outside-pairs)))
+
+#+end_src
+
+* Password Management
+
+#+begin_src emacs-lisp
+
+(use-package password-store
+  :config
+  (setq password-store-password-length 12))
+
+(use-package auth-source-pass
+  :config
+  (auth-source-pass-enable))
+
+(apts/leader-key-def
+  "ap" '(:ignore t :which-key "pass")
+  "apg" 'password-store-generate)
+
+#+end_src
+
+* File Browsing
+
+** Dired
+
+#+begin_src emacs-lisp
+
+(use-package all-the-icons-dired)
+
+(use-package dired
+  :ensure nil
+  :defer 1
+  :commands (dired dired-jump)
+  :config
+  (setq dired-listing-switches "-agho --group-directories-first"
+        dired-omit-files "^\\.[^.].*"
+        dired-omit-verbose nil
+        dired-hide-details-hide-symlink-targets nil
+        delete-by-moving-to-trash t)
+
+  (autoload 'dired-omit-mode "dired-x")
+
+  (add-hook 'dired-load-hook
+            (lambda ()
+              (interactive)
+              (dired-collapse)))
+
+  (add-hook 'dired-mode-hook
+            (lambda ()
+              (interactive)
+ ;;             (dired-omit-mode 1)
+ ;;             (dired-hide-details-mode 1)
+              (all-the-icons-dired-mode 1)
+              (hl-line-mode 1)))
+
+  (use-package dired-rainbow
+    :defer 2
+    :config
+    (dired-rainbow-define-chmod directory "#6cb2eb" "d.*")
+    (dired-rainbow-define html "#eb5286" ("css" "less" "sass" "scss" "htm" "html" "jhtm" "mht" "eml" "mustache" "xhtml"))
+    (dired-rainbow-define xml "#f2d024" ("xml" "xsd" "xsl" "xslt" "wsdl" "bib" "json" "msg" "pgn" "rss" "yaml" "yml" "rdata"))
+    (dired-rainbow-define document "#9561e2" ("docm" "doc" "docx" "odb" "odt" "pdb" "pdf" "ps" "rtf" "djvu" "epub" "odp" "ppt" "pptx"))
+    (dired-rainbow-define markdown "#ffed4a" ("org" "etx" "info" "markdown" "md" "mkd" "nfo" "pod" "rst" "tex" "textfile" "txt"))
+    (dired-rainbow-define database "#6574cd" ("xlsx" "xls" "csv" "accdb" "db" "mdb" "sqlite" "nc"))
+    (dired-rainbow-define media "#de751f" ("mp3" "mp4" "mkv" "MP3" "MP4" "avi" "mpeg" "mpg" "flv" "ogg" "mov" "mid" "midi" "wav" "aiff" "flac"))
+    (dired-rainbow-define image "#f66d9b" ("tiff" "tif" "cdr" "gif" "ico" "jpeg" "jpg" "png" "psd" "eps" "svg"))
+    (dired-rainbow-define log "#c17d11" ("log"))
+    (dired-rainbow-define shell "#f6993f" ("awk" "bash" "bat" "sed" "sh" "zsh" "vim"))
+    (dired-rainbow-define interpreted "#38c172" ("py" "ipynb" "rb" "pl" "t" "msql" "mysql" "pgsql" "sql" "r" "clj" "cljs" "scala" "js"))
+    (dired-rainbow-define compiled "#4dc0b5" ("asm" "cl" "lisp" "el" "c" "h" "c++" "h++" "hpp" "hxx" "m" "cc" "cs" "cp" "cpp" "go" "f" "for" "ftn" "f90" "f95" "f03" "f08" "s" "rs" "hi" "hs" "pyc" ".java"))
+    (dired-rainbow-define executable "#8cc4ff" ("exe" "msi"))
+    (dired-rainbow-define compressed "#51d88a" ("7z" "zip" "bz2" "tgz" "txz" "gz" "xz" "z" "Z" "jar" "war" "ear" "rar" "sar" "xpi" "apk" "xz" "tar"))
+    (dired-rainbow-define packaged "#faad63" ("deb" "rpm" "apk" "jad" "jar" "cab" "pak" "pk3" "vdf" "vpk" "bsp"))
+    (dired-rainbow-define encrypted "#ffed4a" ("gpg" "pgp" "asc" "bfe" "enc" "signature" "sig" "p12" "pem"))
+    (dired-rainbow-define fonts "#6cb2eb" ("afm" "fon" "fnt" "pfb" "pfm" "ttf" "otf"))
+    (dired-rainbow-define partition "#e3342f" ("dmg" "iso" "bin" "nrg" "qcow" "toast" "vcd" "vmdk" "bak"))
+    (dired-rainbow-define vc "#0074d9" ("git" "gitignore" "gitattributes" "gitmodules"))
+    (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*"))
+
+  (use-package dired-single
+    :defer t)
+
+  (use-package dired-ranger
+    :defer t)
+
+  (use-package dired-collapse
+    :defer t)
+
+  (evil-collection-define-key 'normal 'dired-mode-map
+    "h" 'dired-single-up-directory
+    "H" 'dired-omit-mode
+    "l" 'dired-single-buffer
+    "y" 'dired-ranger-copy
+    "X" 'dired-ranger-move
+    "p" 'dired-ranger-paste))
+
+#+end_src
+
+** Opening Files Externally
+
+#+begin_src emacs-lisp
+
+(use-package openwith
+  :config
+  (setq openwith-associations
+        (list
+          (list (openwith-make-extension-regexp
+                '("mpg" "mpeg" "mp3" "mp4"
+                  "avi" "wmv" "wav" "mov" "flv"
+                  "ogm" "ogg" "mkv"))
+                "mpv"
+                '(file))
+          (list (openwith-make-extension-regexp
+                '("xbm" "pbm" "pgm" "ppm" "pnm"
+                  "png" "gif" "bmp" "tif" "jpeg")) ;; Removed jpg because Telega was
+                  ;; causing feh to be opened...
+                  "feh"
+                  '(file))
+          (list (openwith-make-extension-regexp
+                '("pdf"))
+                "zathura"
+                '(file)))))
+
+#+end_src
+
+
+* Org Mode
+
+** Configuration
+
+#+begin_src emacs-lisp
+
+
+;; TODO: Mode this to another section
+(setq-default fill-column 80)
+
+;; Turn on indentation and auto-fill mode for Org files
+(defun apts/org-mode-setup ()
+  (org-indent-mode)
+  (variable-pitch-mode 1)
+  (auto-fill-mode 0)
+  (visual-line-mode 1)
+  (setq evil-auto-indent nil)
+  (diminish org-indent-mode))
+
+(use-package org
+  :defer t
+  :hook (org-mode . apts/org-mode-setup)
+  :config
+  (setq org-ellipsis " ▾"
+        org-hide-emphasis-markers t
+        org-src-fontify-natively t
+        org-fontify-quote-and-verse-blocks t
+        org-src-tab-acts-natively t
+        org-edit-src-content-indentation 2
+        org-hide-block-startup nil
+        org-src-preserve-indentation nil
+        org-startup-folded 'content
+        org-cycle-separator-lines 2)
+
+  (setq org-modules
+    '(org-crypt
+        org-habit
+        org-bookmark
+        org-eshell
+        org-irc))
+
+  (setq org-refile-targets '((nil :maxlevel . 1)
+                             (org-agenda-files :maxlevel . 1)))
+
+  (setq org-outline-path-complete-in-steps nil)
+  (setq org-refile-use-outline-path t)
+
+  (evil-define-key '(normal insert visual) org-mode-map (kbd "C-j") 'org-next-visible-heading)
+  (evil-define-key '(normal insert visual) org-mode-map (kbd "C-k") 'org-previous-visible-heading)
+
+  (evil-define-key '(normal insert visual) org-mode-map (kbd "M-j") 'org-metadown)
+  (evil-define-key '(normal insert visual) org-mode-map (kbd "M-k") 'org-metaup)
+
+  (org-babel-do-load-languages
+    'org-babel-load-languages
+    '((emacs-lisp . t)))
+
+  (push '("conf-unix" . conf-unix) org-src-lang-modes)
+
+  ;; NOTE: Subsequent sections are still part of this use-package block!
+
+#+end_src
+
+
+** Fonts and Bullets
+
+#+begin_src emacs-lisp
+
+(use-package org-superstar
+  :after org
+  :hook (org-mode . org-superstar-mode)
+  :custom
+  (org-superstar-remove-leading-stars t)
+  (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●")))
+
+;; Replace list hyphen with dot
+;; (font-lock-add-keywords 'org-mode
+;;                         '(("^ *\\([-]\\) "
+;;                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
+;; Increase the size of various headings
+(set-face-attribute 'org-document-title nil :font "fantasque sans mono Nerd Font" :weight 'bold)
+(dolist (face '((org-level-1 . 1.2)
+                (org-level-2 . 1.1)
+                (org-level-3 . 1.05)
+                (org-level-4 . 1.0)
+                (org-level-5 . 1.1)
+                (org-level-6 . 1.1)
+                (org-level-7 . 1.1)
+                (org-level-8 . 1.1)))
+  (set-face-attribute (car face) nil :font "fantasque sans mono Nerd Font" :weight 'bold :height 145))
+
+;; Make sure org-indent face is available
+(require 'org-indent)
+
+;; Ensure that anything that should be fixed-pitch in Org files appears that way
+(set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+(set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
+(set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+(set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+(set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
+(set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+(set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+(set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+(set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+
+;; Get rid of the background on column views
+(set-face-attribute 'org-column nil :background nil)
+(set-face-attribute 'org-column-title nil :background nil)
+
+#+end_src
+
+
+** Block Templates
+
+#+begin_src emacs-lisp
+
+;; This is needed as of Org 9.2
+(require 'org-tempo)
+
+(add-to-list 'org-structure-template-alist '("sh" . "src sh"))
+(add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+(add-to-list 'org-structure-template-alist '("sc" . "src scheme"))
+(add-to-list 'org-structure-template-alist '("ts" . "src typescript"))
+(add-to-list 'org-structure-template-alist '("py" . "src python"))
+(add-to-list 'org-structure-template-alist '("go" . "src go"))
+(add-to-list 'org-structure-template-alist '("php" . "src php"))
+(add-to-list 'org-structure-template-alist '("yaml" . "src yaml"))
+(add-to-list 'org-structure-template-alist '("json" . "src json"))
+
+#+end_src
+
+** Export Configs
+
+#+begin_src emacs-lisp
+
+(setq org-src-fontify-natively t
+    org-src-tab-acts-natively t
+    org-confirm-babel-evaluate nil
+    org-edit-src-content-indentation 0)
+
+(use-package htmlize
+	:defer t)
+
+(use-package ox-man
+  :ensure nil)
+
+#+end_src
+
+** Bindings
+
+#+begin_src emacs-lisp
+
+(use-package evil-org
+  :after org
+  :hook ((org-mode . evil-org-mode)
+         (org-agenda-mode . evil-org-mode)
+         (evil-org-mode . (lambda () (evil-org-set-key-theme '(navigation todo insert textobjects additional)))))
+  :config
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys))
+
+(apts/leader-key-def
+  "o"   '(:ignore t :which-key "org mode")
+  "oi"  '(:ignore t :which-key "insert")
+  "oil" '(org-insert-link :which-key "insert link")
+  "on"  '(org-toggle-narrow-to-subtree :which-key "toggle narrow")
+  "oa"  '(org-agenda :which-key "status")
+  "ot"  '(org-todo-list :which-key "todos")
+  "oc"  '(org-capture t :which-key "capture")
+  "ox"  '(org-export-dispatch t :which-key "export"))
+
+#+end_src
+
+** End
+
+End of =use-package org=
+
+#+begin_src emacs-lisp
+
+)
+
+#+end_src
+
+
+** Update Table of Contents on Save
+
+It's nice to have a table of contents section for long literate configuration files (like this one!) so I use org-make-toc to automatically update the ToC in any header with a property named TOC.
+
+#+begin_src emacs-lisp
+
+(use-package org-make-toc
+  :hook (org-mode . org-make-toc-mode))
+
+#+end_src
+
+
+* Development
+
+** Magit
+
+#+begin_src emacs-lisp
+
+(use-package magit
+  :bind ("C-M-;" . magit-status)
+  :commands (magit-status magit-get-current-branch)
+  :custom
+  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+(apts/leader-key-def
+  "g"   '(:ignore t :which-key "git")
+  "gs"  'magit-status
+  "gd"  'magit-diff-unstaged
+  "gc"  'magit-branch-or-checkout
+  "gl"   '(:ignore t :which-key "log")
+  "glc" 'magit-log-current
+  "glf" 'magit-log-buffer-file
+  "gb"  'magit-branch
+  "gP"  'magit-push-current
+  "gp"  'magit-pull-branch
+  "gf"  'magit-fetch
+  "gF"  'magit-fetch-all
+  "gr"  'magit-rebase)
+
+
+#+end_src
+
+** Projectile
+
+#+begin_src emacs-lisp
+
+(defun apts/switch-project-action ()
+  "Switch to a workspace with the project name and start `magit-status'."
+  ;; TODO: Switch to EXWM workspace 1?
+  (persp-switch (projectile-project-name))
+  (magit-status))
+
+(use-package projectile
+  :diminish projectile-mode
+  :config (projectile-mode)
+  :demand t
+  :bind-keymap
+  ("C-c p" . projectile-command-map)
+  :init
+  (when (file-directory-p "~/Project")
+    (setq projectile-project-search-path '("~/Project")))
+  (setq projectile-switch-project-action #'apts/switch-project-action)
+	(setq projectile-globally-ignored-directorie '("node_modules")))
+
+(use-package counsel-projectile
+  :after projectile
+  :bind (("C-M-p" . counsel-projectile-find-file))
+  :config
+  (counsel-projectile-mode))
+
+(apts/leader-key-def
+  "p"   '(:ignore t :which-key "projectile")
+  "pf"  'counsel-projectile-find-file
+  "ps"  'counsel-projectile-switch-project
+  ;;"pF"  'counsel-projectile-rg
+  "pF"  'counsel-rg
+  "pp"  'counsel-projectile
+  "pc"  'projectile-compile-project
+  "pd"  'projectile-dired)
+
+#+end_src
