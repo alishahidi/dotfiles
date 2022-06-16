@@ -3,11 +3,13 @@
 #+DESCRIPTION: Ali Shahidi personal Emacs config.
 #+OPTIONS: num:nil ^:{}
 
+
 * About this config
 This is my emacs config
 
 I got help from daviwil dotfiles [[https://config.daviwil.com/emacs][link]] & Derek Taylor(dt) dotfiles [[https://gitlab.com/dwt1/dotfiles][link]]
 I made custom changes to existing configurations to configure emacs as I liked
+
 
 * Important!
 If you want load configs from org file into el file you must add this code to your init.el file
@@ -20,6 +22,7 @@ If you want load configs from org file into el file you must add this code to yo
   user-emacs-directory))
 
 #+end_example
+
 
 * Performance
 
@@ -56,6 +59,7 @@ If you want load configs from org file into el file you must add this code to yo
 (setq x-select-enable-clipboard-manager nil)
 
 #+end_src
+
 
 * Package Management
 
@@ -114,6 +118,7 @@ If you want load configs from org file into el file you must add this code to yo
 
 #+end_src
 
+
 * Kepp .emacs.d Clean
 
 #+begin_src emacs-lisp
@@ -134,6 +139,7 @@ If you want load configs from org file into el file you must add this code to yo
 
 #+end_src
 
+
 * Default Coding System
 
 #+begin_src emacs-lisp
@@ -141,6 +147,7 @@ If you want load configs from org file into el file you must add this code to yo
 (set-default-coding-systems 'utf-8)
 
 #+end_src
+
 
 * Keyboard Bindings
 
@@ -161,7 +168,6 @@ Since I let evil-mode take over C-u for buffer scrolling, I need to re-bind the 
 (global-set-key (kbd "C-M-u") 'universal-argument)
 
 #+end_src
-
 
 ** Evil Mode
 
@@ -269,6 +275,7 @@ Since I let evil-mode take over C-u for buffer scrolling, I need to re-bind the 
   :config (key-chord-mode 1))
 
 #+end_src
+
 
 * General Configuration
 
@@ -430,7 +437,6 @@ Since I let evil-mode take over C-u for buffer scrolling, I need to re-bind the 
 
 #+end_src
 
-
 **** Emojis in buffers
 
 #+begin_src emacs-lisp
@@ -438,6 +444,33 @@ Since I let evil-mode take over C-u for buffer scrolling, I need to re-bind the 
 (use-package emojify
   :hook (erc-mode . emojify-mode)
   :commands emojify-mode)
+
+#+end_src
+
+
+*** Tabs
+
+#+begin_src emacs-lisp
+
+(use-package centaur-tabs
+  :demand
+  :init
+  (setq centaur-tabs-set-icons t
+        centaur-tabs-gray-out-icons 'buffer
+				centaur-tabs-style "bar"
+				centaur-tabs-set-bar 'under
+				x-underline-at-descent-line t
+        centaur-tabs-set-modified-marker t
+        centaur-tabs-close-button "x"
+        centaur-tabs-modified-marker "*"
+        centaur-tabs-cycle-scope 'tabs)
+  :hook
+  ((dired-mode dashboard-mode) . centaur-tabs-local-mode)
+  :config
+  (centaur-tabs-mode t)
+  :bind
+  ("C-<prior>" . centaur-tabs-backward)
+  ("C-<next>" . centaur-tabs-forward))
 
 #+end_src
 
@@ -560,6 +593,7 @@ The diminish package hides pesky minor modes from the modelines.
 
 #+end_src
 
+
 * Editing Configuration
 
 ** Tab Widths
@@ -625,6 +659,7 @@ The diminish package hides pesky minor modes from the modelines.
 
 #+end_src
 
+
 * Configuration Files
 
 ** Helpers
@@ -663,6 +698,7 @@ The diminish package hides pesky minor modes from the modelines.
 
 #+end_src
 
+
 * Stateful Keymaps with Hydra
 
 #+begin_src emacs-lisp
@@ -671,6 +707,7 @@ The diminish package hides pesky minor modes from the modelines.
   :defer 1)
 
 #+end_src
+
 
 * Better Completions with Ivy
 
@@ -681,7 +718,7 @@ The diminish package hides pesky minor modes from the modelines.
 ;; ivy configs
 (use-package ivy
   :diminish
-  :bind (("C-s" . swiper)
+  :bind (;;("C-s" . swiper)
          :map ivy-minibuffer-map
          ("TAB" . ivy-alt-done)
          ("C-f" . ivy-alt-done)
@@ -797,6 +834,7 @@ The diminish package hides pesky minor modes from the modelines.
   "fj"  '(counsel-file-jump :which-key "jump to file"))
 
 #+end_src
+
 
 * Completion System
 
@@ -933,6 +971,7 @@ folder, otherwise delete a word"
 
 #+end_src
 
+
 * Jumping with Avy
 
 #+begin_src emacs-lisp
@@ -994,7 +1033,6 @@ ace-window helps with easily switching between windows based on a predefined set
 
 #+end_src
 
-
 ** Set Margins for Modes
 
 #+begin_src emacs-lisp
@@ -1026,6 +1064,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 
 #+end_src
 
+
 * Expand Region
 
 #+begin_src emacs-lisp
@@ -1035,6 +1074,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
          ("C-(" . er/mark-outside-pairs)))
 
 #+end_src
+
 
 * Password Management
 
@@ -1053,6 +1093,7 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
   "apg" 'password-store-generate)
 
 #+end_src
+
 
 * File Browsing
 
@@ -1222,7 +1263,6 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 
 #+end_src
 
-
 ** Fonts and Bullets
 
 #+begin_src emacs-lisp
@@ -1270,7 +1310,6 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 (set-face-attribute 'org-column-title nil :background nil)
 
 #+end_src
-
 
 ** Block Templates
 
@@ -1343,7 +1382,6 @@ End of =use-package org=
 
 #+end_src
 
-
 ** Update Table of Contents on Save
 
 It's nice to have a table of contents section for long literate configuration files (like this one!) so I use org-make-toc to automatically update the ToC in any header with a property named TOC.
@@ -1352,6 +1390,52 @@ It's nice to have a table of contents section for long literate configuration fi
 
 (use-package org-make-toc
   :hook (org-mode . org-make-toc-mode))
+
+#+end_src
+
+** Presentations
+
+*** org-tree-slide
+
+I previously used org-tree-slide for presentations before trying out org-present.
+
+#+begin_src emacs-lisp
+
+(defun apts/org-start-presentation ()
+  (interactive)
+  (org-tree-slide-mode 1)
+  (setq text-scale-mode-amount 3)
+  (text-scale-mode 1))
+
+(defun apts/org-end-presentation ()
+  (interactive)
+  (text-scale-mode 0)
+  (org-tree-slide-mode 0))
+
+(use-package org-tree-slide
+  :defer t
+  :after org
+  :commands org-tree-slide-mode
+  :config
+  (evil-define-key 'normal org-tree-slide-mode-map
+    (kbd "q") 'apts/org-end-presentation
+    (kbd "C-j") 'org-tree-slide-move-next-tree
+    (kbd "C-k") 'org-tree-slide-move-previous-tree)
+  (setq org-tree-slide-slide-in-effect nil
+        org-tree-slide-activate-message "Presentation started."
+        org-tree-slide-deactivate-message "Presentation ended."
+        org-tree-slide-header t))
+
+#+end_src
+
+** Auto-show Markup Symbols
+
+This package makes it much easier to edit Org documents when =org-hide-emphasis-markers= is turned on. It temporarily shows the emphasis markers around certain markup elements when you place your cursor inside of them. No more fumbling around with === and =*= characters!
+
+#+begin_src emacs-lisp
+
+(use-package org-appear
+  :hook (org-mode . org-appear-mode))
 
 #+end_src
 
@@ -1423,5 +1507,414 @@ It's nice to have a table of contents section for long literate configuration fi
   "pp"  'counsel-projectile
   "pc"  'projectile-compile-project
   "pd"  'projectile-dired)
+
+#+end_src
+
+** Languages
+
+*** Language Server Support
+
+#+begin_src emacs-lisp
+
+(use-package lsp-mode
+  :straight t
+  :commands lsp
+  :hook ((typescript-mode js2-mode web-mode php-mode) . lsp)
+  ;;:bind (:map lsp-mode-map
+  ;;       ("TAB" . completion-at-point))
+  :custom (lsp-headerline-breadcrumb-enable nil))
+
+(apts/leader-key-def
+  "l"  '(:ignore t :which-key "lsp")
+  "ld" 'xref-find-definitions
+  "lr" 'xref-find-references
+  "ln" 'lsp-ui-find-next-reference
+  "lp" 'lsp-ui-find-prev-reference
+  "ls" 'counsel-imenu
+  "le" 'lsp-ui-flycheck-list
+  "lS" 'lsp-ui-sideline-mode
+  "lX" 'lsp-execute-code-action)
+
+(use-package lsp-ui
+  :straight t
+  :hook (lsp-mode . lsp-ui-mode)
+  :config
+  (setq lsp-ui-sideline-enable t)
+  (setq lsp-ui-sideline-show-hover nil)
+  (setq lsp-ui-doc-position 'bottom)
+  (lsp-ui-doc-show))
+
+;; (use-package lsp-ivy
+;;   :hook (lsp-mode . lsp-ivy-mode))
+
+#+end_src
+
+*** Debug Adapter Support
+
+#+begin_src emacs-lisp
+
+(use-package dap-mode
+  :straight t
+  :custom
+  (lsp-enable-dap-auto-configure nil)
+  :config
+  (dap-ui-mode 1)
+  (dap-tooltip-mode 1)
+  (require 'dap-node)
+  (dap-node-setup))
+
+#+end_src
+
+*** Meta Lisp
+
+#+begin_src emacs-lisp
+
+(use-package lispy
+  :hook ((emacs-lisp-mode . lispy-mode)
+         (scheme-mode . lispy-mode)))
+
+;; (use-package evil-lispy
+;;   :hook ((lispy-mode . evil-lispy-mode)))
+
+(use-package lispyville
+  :hook ((lispy-mode . lispyville-mode))
+  :config
+  (lispyville-set-key-theme '(operators c-w additional
+                              additional-movement slurp/barf-cp
+                              prettify)))
+
+#+end_src
+
+*** Clojure
+
+#+begin_src emacs-lisp
+
+(use-package cider
+  :mode "\\.clj[sc]?\\'"
+  :config
+  (evil-collection-cider-setup))
+
+#+end_src
+
+*** Common Lisp
+
+#+begin_src emacs-lisp
+
+(use-package sly
+  :disabled
+  :mode "\\.lisp\\'")
+
+(use-package slime
+  :disabled
+  :mode "\\.lisp\\'")
+
+#+end_src
+
+*** Scheme
+
+*** TypeScript and JavaScript
+
+#+begin_src emacs-lisp
+
+(use-package typescript-mode
+  :mode "\\.ts\\'"
+  :config
+  (setq typescript-indent-level 2))
+
+(defun apts/set-js-indentation ()
+  (setq js-indent-level 2)
+  (setq evil-shift-width js-indent-level)
+  (setq-default tab-width 2))
+
+(use-package js2-mode
+  :mode "\\.jsx?\\'"
+  :config
+  ;; Use js2-mode for Node scripts
+  (add-to-list 'magic-mode-alist '("#!/usr/bin/env node" . js2-mode))
+
+  ;; Don't use built-in syntax checking
+  (setq js2-mode-show-strict-warnings nil)
+
+  ;; Set up proper indentation in JavaScript and JSON files
+  (add-hook 'js2-mode-hook #'apts/set-js-indentation)
+  (add-hook 'json-mode-hook #'apts/set-js-indentation))
+
+
+;;(use-package apheleia
+;;  :config
+;;  (apheleia-global-mode +1))
+
+(use-package prettier-js
+  ;; :hook ((js2-mode . prettier-js-mode)
+  ;;        (typescript-mode . prettier-js-mode))
+  :config
+  (setq prettier-js-show-errors nil))
+
+#+end_src
+
+*** Rust
+
+#+begin_src emacs-lisp
+
+(use-package rust-mode
+  :mode "\\.rs\\'"
+  :init (setq rust-format-on-save t))
+
+(use-package cargo
+  :straight t
+  :defer t)
+
+#+end_src
+
+*** Emacs Lisp
+
+#+begin_src emacs-lisp
+
+(add-hook 'emacs-lisp-mode-hook #'flycheck-mode)
+
+(use-package helpful
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . helpful-function)
+  ([remap describe-symbol] . helpful-symbol)
+  ([remap describe-variable] . helpful-variable)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-key] . helpful-key))
+
+(apts/leader-key-def
+  "e"   '(:ignore t :which-key "eval")
+  "eb"  '(eval-buffer :which-key "eval buffer"))
+
+(apts/leader-key-def
+  :keymaps '(visual)
+  "er" '(eval-region :which-key "eval region"))
+
+#+end_src
+
+*** Scheme
+
+#+begin_src emacs-lisp
+
+(use-package geiser
+  :straight t
+ :bind (:map geiser-mode-map
+        ("TAB" . completion-at-point))
+  :config
+  ;; (setq geiser-default-implementation 'gambit)
+  (setq geiser-default-implementation 'guile)
+  (setq geiser-active-implementations '(gambit guile))
+  (setq geiser-repl-default-port 44555) ; For Gambit Scheme
+  (setq geiser-implementations-alist '(((regexp "\\.scm$") gambit)
+                                       ((regexp "\\.sld") gambit))))
+
+#+end_src
+
+*** Markdown
+
+#+begin_src emacs-lisp
+
+(use-package markdown-mode
+  :straight t
+  :mode "\\.md\\'"
+  :config
+  (setq markdown-command "marked")
+  (defun apts/set-markdown-header-font-sizes ()
+    (dolist (face '((markdown-header-face-1 . 1.2)
+                    (markdown-header-face-2 . 1.1)
+                    (markdown-header-face-3 . 1.0)
+                    (markdown-header-face-4 . 1.0)
+                    (markdown-header-face-5 . 1.0)))
+      (set-face-attribute (car face) nil :weight 'normal :height (cdr face))))
+
+  (defun apts/markdown-mode-hook ()
+    (apts/set-markdown-header-font-sizes))
+
+  (add-hook 'markdown-mode-hook 'apts/markdown-mode-hook))
+
+#+end_src
+
+*** HTML
+
+#+begin_src emacs-lisp
+
+(use-package web-mode
+  :mode "\\.html\\'"
+  ;; :mode "(\\.\\(html?\\|ejs\\|tsx\\|jsx\\|html\\)\\'"
+  :config
+  (setq-default web-mode-code-indent-offset 2)
+  (setq-default web-mode-markup-indent-offset 2)
+  (setq-default web-mode-attribute-indent-offset 2))
+
+;; 1. Start the server with `httpd-start'
+;; 2. Use `impatient-mode' on any buffer
+(use-package impatient-mode
+  :straight t)
+
+(use-package skewer-mode
+  :straight t)
+
+#+end_src
+
+*** PHP
+
+#+begin_src emacs-lisp
+
+(use-package php-mode
+	:mode "\\.php\\'" )
+
+(use-package phpunit
+ :ensure t)
+
+#+end_src
+
+*** YAML
+
+#+begin_src emacs-lisp
+
+(use-package yaml-mode
+  :mode "\\.ya?ml\\'")
+
+#+end_src
+
+** Compilation
+
+#+begin_src emacs-lisp
+
+(use-package compile
+  :straight nil
+  :custom
+  (compilation-scroll-output t))
+
+(defun auto-recompile-buffer ()
+  (interactive)
+  (if (member #'recompile after-save-hook)
+      (remove-hook 'after-save-hook #'recompile t)
+    (add-hook 'after-save-hook #'recompile nil t)))
+
+#+end_src
+
+** Productivity
+
+*** Syntax checking with Flycheck
+
+#+begin_src emacs-lisp
+
+(use-package flycheck
+  :defer t
+  :hook (lsp-mode . flycheck-mode))
+
+#+end_src
+
+*** Company
+
+#+begin_src emacs-lisp
+
+(use-package company
+  :bind (:map company-active-map
+         ("C-n" . company-select-next)
+         ("C-p" . company-select-previous))
+  :config
+  (setq company-idle-delay 0.3)
+  (global-company-mode t))
+
+#+end_src
+
+*** Snippets
+
+#+begin_src emacs-lisp
+
+(use-package yasnippet
+  :hook (prog-mode . yas-minor-mode)
+  :config
+  (yas-reload-all))
+
+#+end_src
+
+*** Smart Parens
+
+#+begin_src emacs-lisp
+
+(use-package smartparens
+  :hook (prog-mode . smartparens-mode))
+
+#+end_src
+
+*** TreeMacs
+
+/If You enjoy treemacs you can uncomment this block/
+
+#+begin_src emacs-lisp
+
+;; (use-package treemacs)
+
+
+;; (use-package treemacs-evil
+;;   :defer t
+;;   :config
+;;   (define-key! evil-treemacs-state-map
+;;     [return] #'treemacs-RET-action
+;;     [tab]    #'treemacs-TAB-action
+;;     "TAB"    #'treemacs-TAB-action
+;;     "o v"    #'treemacs-visit-node-horizontal-split
+;;     "o s"    #'treemacs-visit-node-vertical-split))
+
+
+;; (use-package treemacs-persp
+;;   :after treemacs
+;;   :config (treemacs-set-scope-type 'Perspectives))
+
+;; (use-package lsp-treemacs
+;;   :after (treemacs lsp))
+
+#+end_src
+
+*** NeoTree
+
+#+begin_src emacs-lisp
+
+;; Function for setting a fixed width for neotree.
+;; Defaults to 25 but I make it a bit longer (35) in the 'use-package neotree'.
+(defcustom neo-window-width 25
+  "*Specifies the width of the NeoTree window."
+  :type 'integer
+  :group 'neotree)
+
+(use-package neotree
+  :config
+  (setq neo-smart-open t
+        neo-window-width 30
+        neo-theme (if (display-graphic-p) 'icons 'arrow)
+        ;;neo-window-fixed-size nil
+        inhibit-compacting-font-caches t
+        projectile-switch-project-action 'neotree-projectile-action)
+        ;; truncate long file names in neotree
+        (add-hook 'neo-after-create-hook
+           #'(lambda (_)
+               (with-current-buffer (get-buffer neo-buffer-name)
+                 (setq truncate-lines t)
+                 (setq word-wrap nil)
+                 (make-local-variable 'auto-hscroll-mode)
+                 (setq auto-hscroll-mode nil)))))
+
+;; show hidden files
+(setq-default neo-show-hidden-files t)
+
+
+(apts/leader-key-def
+  "tn"   '(neotree-toggle :which-key "Toggle neotree file viewer")
+  "dn"   '(neotree-dir :which-key "Open directory in neotree"))
+
+
+#+end_src
+
+
+* Runtime Performance
+
+#+begin_src emacs-lisp
+
+;; Make gc pauses faster by decreasing the threshold.
+;; (setq gc-cons-threshold (* 2 1000 1000))
 
 #+end_src
