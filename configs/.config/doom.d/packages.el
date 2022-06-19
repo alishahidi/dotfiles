@@ -11,7 +11,7 @@
 
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
-;; https://github.com/raxod502/straight.el#the-recipe-format
+;; https://github.com/radian-software/straight.el#the-recipe-format
 ;(package! another-package
 ;  :recipe (:host github :repo "username/repo"))
 
@@ -34,7 +34,7 @@
 
 ;; Specify a `:branch' to install a package from a particular branch or tag.
 ;; This is required for some packages whose default branch isn't 'master' (which
-;; our package manager can't deal with; see raxod502/straight.el#279)
+;; our package manager can't deal with; see radian-software/straight.el#279)
 ;(package! builtin-package :recipe (:branch "develop"))
 
 ;; Use `:pin' to specify a particular commit to install.
@@ -49,12 +49,7 @@
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
 
-;; (package! gitconfig-mode
-;; 	  :recipe (:host github :repo "magit/git-modes"
-;; 			 :files ("gitconfig-mode.el")))
-;; (package! gitignore-mode
-;; 	  :recipe (:host github :repo "magit/git-modes"
-;; 			 :files ("gitignore-mode.el")))
+
 (package! flycheck-aspell)
 (package! async)
 (package! calfw)
@@ -65,16 +60,15 @@
 (package! dired-subtree)
 (package! dmenu)
 (package! elfeed-goodies)
-(package! elpher)
 (package! emojify)
 (package! esxml)
 (package! evil-tutor)
 (package! ivy-posframe)
 (package! mw-thesaurus)
+(package! org-auto-tangle)
 (package! org-board)
 (package! org-web-tools)
 (package! ox-gemini)
-(package! pacmacs)
 (package! peep-dired)
 (package! password-store)
 (package! rainbow-mode)
@@ -85,13 +79,6 @@
 (package! wc-mode)
 (package! beacon)
 (package! clippy)
-(package! minimap)
 (package! olivetti)
-(package! jedi)
-(package! prettier)
-(package! tidy)
-(package! sqlformat)
-(package! webkit-color-picker)
-(package! all-the-icons)
-(package! all-the-icons-dired)
-(package! treemacs-all-the-icons)
+(package! visual-fill-column)
+(package! org-tree-slide)

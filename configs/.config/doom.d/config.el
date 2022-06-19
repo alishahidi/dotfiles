@@ -1,16 +1,11 @@
-;; fix my emacs configs from dwt1 gitlab user
-;; distrotube (dt)
-
-
 (beacon-mode 1)
 
-(map! :leader
-      (:prefix ("b". "buffer")
-       :desc "List bookmarks" "L" #'list-bookmarks
-       :desc "Save current bookmarks to bookmark file" "w" #'bookmark-save))
+
 
 (global-auto-revert-mode 1)
 (setq global-auto-revert-non-file-buffers t)
+
+
 
 (evil-define-key 'normal ibuffer-mode-map
   (kbd "f c") 'ibuffer-filter-by-content
@@ -22,67 +17,7 @@
   (kbd "g h") 'ibuffer-do-kill-lines
   (kbd "g H") 'ibuffer-update)
 
-;; https://stackoverflow.com/questions/9547912/emacs-calendar-show-more-than-3-months
-(defun dt/year-calendar (&optional year)
-  (interactive)
-  (require 'calendar)
-  (let* (
-      (current-year (number-to-string (nth 5 (decode-time (current-time)))))
-      (month 0)
-      (year (if year year (string-to-number (format-time-string "%Y" (current-time))))))
-    (switch-to-buffer (get-buffer-create calendar-buffer))
-    (when (not (eq major-mode 'calendar-mode))
-      (calendar-mode))
-    (setq displayed-month month)
-    (setq displayed-year year)
-    (setq buffer-read-only nil)
-    (erase-buffer)
-    ;; horizontal rows
-    (dotimes (j 4)
-      ;; vertical columns
-      (dotimes (i 3)
-        (calendar-generate-month
-          (setq month (+ month 1))
-          year
-          ;; indentation / spacing between months
-          (+ 5 (* 25 i))))
-      (goto-char (point-max))
-      (insert (make-string (- 10 (count-lines (point-min) (point-max))) ?\n))
-      (widen)
-      (goto-char (point-max))
-      (narrow-to-region (point-max) (point-max)))
-    (widen)
-    (goto-char (point-min))
-    (setq buffer-read-only t)))
 
-(defun dt/scroll-year-calendar-forward (&optional arg event)
-  "Scroll the yearly calendar by year in a forward direction."
-  (interactive (list (prefix-numeric-value current-prefix-arg)
-                     last-nonmenu-event))
-  (unless arg (setq arg 0))
-  (save-selected-window
-    (if (setq event (event-start event)) (select-window (posn-window event)))
-    (unless (zerop arg)
-      (let* (
-              (year (+ displayed-year arg)))
-        (dt/year-calendar year)))
-    (goto-char (point-min))
-    (run-hooks 'calendar-move-hook)))
-
-(defun dt/scroll-year-calendar-backward (&optional arg event)
-  "Scroll the yearly calendar by year in a backward direction."
-  (interactive (list (prefix-numeric-value current-prefix-arg)
-                     last-nonmenu-event))
-  (dt/scroll-year-calendar-forward (- (or arg 1)) event))
-
-(map! :leader
-      :desc "Scroll year calendar backward" "<left>" #'dt/scroll-year-calendar-backward
-      :desc "Scroll year calendar forward" "<right>" #'dt/scroll-year-calendar-forward)
-
-(defalias 'year-calendar 'dt/year-calendar)
-
-(use-package! calfw)
-(use-package! calfw-org)
 
 (setq centaur-tabs-set-bar 'over
       centaur-tabs-set-icons t
@@ -99,10 +34,14 @@
                                                (kbd "g <down>")  'centaur-tabs-forward-group
                                                (kbd "g <up>")    'centaur-tabs-backward-group)
 
+
+
 (map! :leader
       (:prefix ("c h" . "Help info from Clippy")
        :desc "Clippy describes function under point" "f" #'clippy-describe-function
        :desc "Clippy describes variable under point" "v" #'clippy-describe-variable))
+
+
 
 (use-package dashboard
   :init      ;; tweak dashboard config before loading it
@@ -128,7 +67,10 @@ List of keybindings (SPC h b b)")
   (dashboard-modify-heading-icons '((recents . "file-text")
                                     (bookmarks . "book"))))
 
-(setq doom-fallback-buffer "*dashboard*")
+
+
+(setq doom-fallback-buffer-name "*dashboard*")
+
 
 (map! :leader
       (:prefix ("d" . "dired")
@@ -171,37 +113,20 @@ List of keybindings (SPC h b b)")
                               ("mkv" . "mpv")
                               ("mp4" . "mpv")))
 
+
+
 (evil-define-key 'normal peep-dired-mode-map
   (kbd "j") 'peep-dired-next-file
   (kbd "k") 'peep-dired-prev-file)
 (add-hook 'peep-dired-hook 'evil-normalize-keymaps)
 
-(setq delete-by-moving-to-trash t
-      trash-directory "~/.local/share/Trash/files/")
 
-(setq doom-theme 'doom-dracula)
+(load-theme 'doom-palenight t)
+(setq doom-theme 'doom-palenight)
+(doom-themes-visual-bell-config)
 (map! :leader
       :desc "Load new theme" "h t" #'counsel-load-theme)
 
-(use-package emojify
-  :hook (after-init . global-emojify-mode))
-
-(map! :leader
-      (:prefix ("e". "evaluate/ERC/EWW")
-       :desc "Launch ERC with TLS connection" "E" #'erc-tls))
-
-(setq erc-prompt (lambda () (concat "[" (buffer-name) "]"))
-      erc-server "irc.libera.chat"
-      erc-nick "distrotube"
-      erc-user-full-name "Derek Taylor"
-      erc-track-shorten-start 24
-      erc-autojoin-channels-alist '(("irc.libera.chat" "#unixtube" "#distrotube"))
-      erc-kill-buffer-on-part t
-      erc-fill-column 100
-      erc-fill-function 'erc-fill-static
-      erc-fill-static-center 20
-      ;; erc-auto-query 'bury
-      )
 
 (map! :leader
       (:prefix ("e". "evaluate/ERC/EWW")
@@ -211,16 +136,10 @@ List of keybindings (SPC h b b)")
        :desc "Evaluate last sexpression" "l" #'eval-last-sexp
        :desc "Evaluate elisp in region" "r" #'eval-region))
 
-(setq browse-url-browser-function 'eww-browse-url)
-(map! :leader
-      :desc "Search web for text between BEG/END"
-      "s w" #'eww-search-words
-      (:prefix ("e" . "evaluate/ERC/EWW")
-       :desc "Eww web browser" "w" #'eww
-       :desc "Eww reload page" "R" #'eww-reload))
 
-(setq doom-font (font-spec :family "fantasque sans mono Nerd Font" :size 17)
-      doom-variable-pitch-font (font-spec :family "Ubuntu" :size 15)
+
+(setq doom-font (font-spec :family "fantasque sans mono Nerd Font" :size 15)
+      doom-variable-pitch-font (font-spec :family "fantasque sans mono Nerd Font" :size 15)
       doom-big-font (font-spec :family "fantasque sans mono Nerd Font" :size 24))
 (after! doom-themes
   (setq doom-themes-enable-bold t
@@ -248,6 +167,8 @@ List of keybindings (SPC h b b)")
         :desc "Insert any date" "a" #'dt/insert-any-date
         :desc "Insert todays date" "t" #'dt/insert-todays-date))
 
+
+
 (setq ivy-posframe-display-functions-alist
       '((swiper                     . ivy-posframe-display-at-point)
         (complete-symbol            . ivy-posframe-display-at-point)
@@ -266,10 +187,14 @@ List of keybindings (SPC h b b)")
         (t . 10)))
 (ivy-posframe-mode 1) ; 1 enables posframe-mode, 0 disables it.
 
+
+
 (map! :leader
       (:prefix ("v" . "Ivy")
        :desc "Ivy push view" "v p" #'ivy-push-view
        :desc "Ivy switch view" "v s" #'ivy-switch-view))
+
+
 
 (setq display-line-numbers-type t)
 (map! :leader
@@ -280,32 +205,26 @@ List of keybindings (SPC h b b)")
        :desc "Toggle line highlight globally" "H" #'global-hl-line-mode
        :desc "Toggle truncate lines" "t" #'toggle-truncate-lines))
 
+
+
 (custom-set-faces
  '(markdown-header-face ((t (:inherit font-lock-function-name-face :weight bold :family "variable-pitch"))))
  '(markdown-header-face-1 ((t (:inherit markdown-header-face :height 1.8))))
  '(markdown-header-face-2 ((t (:inherit markdown-header-face :height 1.4))))
  '(markdown-header-face-3 ((t (:inherit markdown-header-face :height 1.2)))))
 
-(setq minimap-window-location 'right)
-(map! :leader
-      (:prefix ("t" . "toggle")
-       :desc "Toggle minimap-mode" "m" #'minimap-mode))
 
-(set-face-attribute 'mode-line nil :font "Ubuntu Mono-13")
+
 (setq doom-modeline-height 30     ;; sets modeline height
       doom-modeline-bar-width 5   ;; sets right bar width
       doom-modeline-persp-name t  ;; adds perspective name to modeline
       doom-modeline-persp-icon t) ;; adds folder icon next to persp name
 
+
+
 (xterm-mouse-mode 1)
 
-(after! doom-themes
-  (setq doom-theme-enable-bold t
-        doom-theme-enable-italic t))
-(setq doom-neotree-file-icons t)
-(setq neo-theme 'icons)
-(doom-themes-neotree-config)
-(setq doom-themes-neotree-file-icons t)
+
 
 (after! neotree
   (setq neo-smart-open t
@@ -316,24 +235,19 @@ List of keybindings (SPC h b b)")
       :desc "Toggle neotree file viewer" "t n" #'neotree-toggle
       :desc "Open directory in neotree" "d n" #'neotree-dir)
 
+
+
 (map! :leader
       (:prefix ("=" . "open file")
-       :desc "Edit agenda file" "a" #'(lambda () (interactive) (find-file "~/Org/agenda.org"))
-       :desc "Edit doom config.org" "c" #'(lambda () (interactive) (find-file "~/.config/doom/config.org"))
-       :desc "Edit doom init.el" "i" #'(lambda () (interactive) (find-file "~/.config/doom/init.el"))
-       :desc "Edit doom packages.el" "p" #'(lambda () (interactive) (find-file "~/.config/doom/packages.el"))))
-(map! :leader
-      (:prefix ("= e" . "open eshell files")
-       :desc "Edit eshell aliases" "a" #'(lambda () (interactive) (find-file "~/.config/doom/eshell/aliases"))
-       :desc "Edit eshell profile" "p" #'(lambda () (interactive) (find-file "~/.config/doom/eshell/profile"))))
+       :desc "Edit doom config.org" "c" #'(lambda () (interactive) (find-file "~/.doom.d/config.el"))
+       :desc "Edit doom init.el" "i" #'(lambda () (interactive) (find-file "~/.doom.d/init.el"))
+       :desc "Edit doom packages.el" "p" #'(lambda () (interactive) (find-file "~/.doom.d/packages.el"))))
+
 
 (map! :leader
       :desc "Org babel tangle" "m B" #'org-babel-tangle)
 (after! org
-  (setq org-directory "~/nc/Org/"
-        org-agenda-files '("~/nc/Org/agenda.org")
-        org-default-notes-file (expand-file-name "notes.org" org-directory)
-        org-ellipsis " ▼ "
+  (setq org-ellipsis " ▼ "
         org-superstar-headline-bullets-list '("◉" "●" "○" "◆" "●" "○" "◆")
         org-superstar-item-bullet-alist '((?+ . ?➤) (?- . ?✦)) ; changes +/- symbols in item lists
         org-log-done 'time
@@ -358,6 +272,7 @@ List of keybindings (SPC h b b)")
              "DONE(d)"           ; Task has been completed
              "CANCELLED(c)" )))) ; Task has been cancelled
 
+
 (custom-set-faces
   '(org-level-1 ((t (:inherit outline-1 :height 1.4))))
   '(org-level-2 ((t (:inherit outline-2 :height 1.3))))
@@ -366,8 +281,45 @@ List of keybindings (SPC h b b)")
   '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
 )
 
+
 (use-package ox-man)
 (use-package ox-gemini)
+
+
+(defun apts/org-start-presentation ()
+  (interactive)
+  (org-tree-slide-mode 1)
+  (setq text-scale-mode-amount 3)
+  (text-scale-mode 1))
+
+(defun apts/org-end-presentation ()
+  (interactive)
+  (text-scale-mode 0)
+  (org-tree-slide-mode 0))
+
+(use-package org-tree-slide
+  :defer t
+  :after org
+  :commands org-tree-slide-mode
+  :config
+  (evil-define-key 'normal org-tree-slide-mode-map
+    (kbd "q") 'apts/org-end-presentation
+    (kbd "C-j") 'org-tree-slide-move-next-tree
+    (kbd "C-k") 'org-tree-slide-move-previous-tree)
+  (setq org-tree-slide-slide-in-effect nil
+        org-tree-slide-activate-message "Presentation started."
+        org-tree-slide-deactivate-message "Presentation ended."
+        org-tree-slide-header t))
+
+
+(defun apts/org-mode-visual-fill ()
+  (setq visual-fill-column-width 110
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package! visual-fill-column
+  :defer t
+  :hook (org-mode . apts/org-mode-visual-fill))
 
 (use-package! password-store)
 
@@ -379,9 +331,12 @@ List of keybindings (SPC h b b)")
       :desc "Add a buffer current perspective" "+" #'persp-add-buffer
       :desc "Remove perspective by name" "-" #'persp-remove-by-name)
 
+
+
 (define-globalized-minor-mode global-rainbow-mode rainbow-mode
   (lambda () (rainbow-mode 1)))
 (global-rainbow-mode 1 )
+
 
 (map! :leader
       (:prefix ("r" . "registers")
@@ -397,11 +352,7 @@ List of keybindings (SPC h b b)")
        :desc "Increment register" "+" #'increment-register
        :desc "Point to register" "SPC" #'point-to-register))
 
-(map! :leader
-      :desc "Eshell" "e s" #'eshell
-      :desc "Eshell popup toggle" "e t" #'+eshell/toggle
-      :desc "Counsel eshell history" "e h" #'counsel-esh-history
-      :desc "Vterm popup toggle" "v t" #'+vterm/toggle)
+
 
 (defun prefer-horizontal-split ()
   (set-variable 'split-height-threshold nil t)
@@ -410,10 +361,14 @@ List of keybindings (SPC h b b)")
 (map! :leader
       :desc "Clone indirect buffer other window" "b c" #'clone-indirect-buffer-other-window)
 
+
+
 (map! :leader
       (:prefix ("w" . "window")
        :desc "Winner redo" "<right>" #'winner-redo
        :desc "Winner undo" "<left>" #'winner-undo))
+
+
 
 (map! :leader
       :desc "Zap to char" "z" #'zap-to-char
@@ -421,12 +376,31 @@ List of keybindings (SPC h b b)")
 
 
 
-;; set line break globally
-(global-visual-line-mode t)
-
-;; set transparency
-(set-frame-parameter (selected-frame) 'alpha '(95 95))
-(add-to-list 'default-frame-alist '(alpha 95 95))
-
 ;; fix xclip problem on emacs quit
 (setq x-select-enable-clipboard-manager nil)
+
+
+(set-default-coding-systems 'utf-8)
+
+
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(global-set-key (kbd "C-M-u") 'universal-argument)
+
+
+(setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
+(setq use-dialog-box nil) ;; Disable dialog boxes since they weren't working in Mac OSX
+(setq scroll-conservatively 101) ;; value greater than 100 gets rid of half page jumping
+(setq mouse-wheel-scroll-amount '(3 ((shift) . 3))) ;; how many lines at a time
+(setq mouse-wheel-progressive-speed nil) ;; dont accelerate scrolling
+
+
+(set-frame-parameter (selected-frame) 'alpha '(90 . 90))
+(add-to-list 'default-frame-alist '(alpha . (90 . 90)))
+
+
+(use-package! super-save
+  :defer 1
+  :diminish super-save-mode
+  :config
+  (super-save-mode +1)
+  (setq super-save-auto-save-when-idle t))

@@ -26,12 +26,19 @@ If you want load configs from org file into el file you must add this code to yo
 
 * Performance
 
-** Startup
+
+** Gcmh
 
 #+begin_src emacs-lisp
 
-;; The default is 800 kilobytes.  Measured in bytes.
-(setq gc-cons-threshold (* 50 1000 1000))
+(load-file "~/.emacs.d/lisp/gcmh.el")
+(gcmh-mode 1)
+
+#+end_src
+
+** Startup
+
+#+begin_src emacs-lisp
 
 ;; Profile emacs startup
 (add-hook 'emacs-startup-hook
@@ -187,7 +194,7 @@ Since I let evil-mode take over C-u for buffer scrolling, I need to re-bind the 
 
 (defun apts/dont-arrow-me-bro ()
   (interactive)
-  (message "Arrow keys are bad, you know?"))
+  (message "Use h, j, k, l instance of arrow key."))
 
 (use-package undo-tree
   :init
@@ -242,9 +249,10 @@ Since I let evil-mode take over C-u for buffer scrolling, I need to re-bind the 
 #+begin_src emacs-lisp
 
 (use-package which-key
-  :init (which-key-mode)
+	:defer 0
   :diminish which-key-mode
   :config
+	(which-key-mode)
   (setq which-key-idle-delay 0.3))
 
 #+end_src
@@ -254,6 +262,7 @@ Since I let evil-mode take over C-u for buffer scrolling, I need to re-bind the 
 #+begin_src emacs-lisp
 
 (use-package general
+	:after evil
   :config
   (general-evil-setup t)
 
@@ -704,7 +713,7 @@ The diminish package hides pesky minor modes from the modelines.
 #+begin_src emacs-lisp
 
 (use-package hydra
-  :defer 1)
+  :defer t)
 
 #+end_src
 
@@ -718,7 +727,7 @@ The diminish package hides pesky minor modes from the modelines.
 ;; ivy configs
 (use-package ivy
   :diminish
-  :bind (;;("C-s" . swiper)
+  :bind (("C-s" . swiper)
          :map ivy-minibuffer-map
          ("TAB" . ivy-alt-done)
          ("C-f" . ivy-alt-done)
@@ -753,12 +762,12 @@ The diminish package hides pesky minor modes from the modelines.
 
 (use-package ivy-hydra
   :defer t
-  :after hydra)
+  :after (ivy hydra))
 
 (use-package ivy-rich
+  :after (ivy counsel)
   :init
   (ivy-rich-mode 1)
-  :after counsel
   :config
   (setq ivy-format-function #'ivy-format-function-line)
   (setq ivy-rich-display-transformers-list
@@ -925,7 +934,7 @@ folder, otherwise delete a word"
 (use-package consult
   :straight t
   :demand t
-  :bind (("C-s" . consult-line)
+  :bind (;;("C-s" . consult-line)
          ("C-M-l" . consult-imenu)
          ("C-M-j" . persp-switch-to-buffer*)
          :map minibuffer-local-map
@@ -1042,9 +1051,15 @@ ace-window helps with easily switching between windows based on a predefined set
         visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
+(defun apts/prog-mode-visual-fill ()
+  (setq visual-fill-column-width 200
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
 (use-package visual-fill-column
   :defer t
-  :hook (org-mode . apts/org-mode-visual-fill))
+  :hook (org-mode . apts/org-mode-visual-fill)
+	(prog-mode . apts/prog-mode-visual-fill))
 
 #+end_src
 
@@ -1098,6 +1113,67 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 * File Browsing
 
 ** Dired
+
+*** Key Bindings
+
+**** Navigation
+
+*Emacs* / *Evil*
+- =n= / =j= - next line
+- =p= / =k= - previous line
+- =j= / =J= - jump to file in buffer
+- =RET= - select file or directory
+- =^= - go to parent directory
+- =S-RET= / =g O= - Open file in "other" window
+- =M-RET= - Show file in other window without focusing (previewing files)
+- =g o= (=dired-view-file=) - Open file but in a "preview" mode, close with =q=
+- =g= / =g r= Refresh the buffer with =revert-buffer= after changing configuration (and after filesystem changes!)
+
+**** Marking files
+
+- =m= - Marks a file
+- =u= - Unmarks a file
+- =U= - Unmarks all files in buffer
+- =* t= / =t= - Inverts marked files in buffer
+- =% m= - Mark files in buffer using regular expression
+- =*= - Lots of other auto-marking functions
+- =k= / =K= - "Kill" marked items (refresh buffer with =g= / =g r= to get them back)
+- Many operations can be done on a single file if there are no active marks!
+
+**** Copying and Renaming files
+
+- =C= - Copy marked files (or if no files are marked, the current file)
+- Copying single and multiple files
+- =U= - Unmark all files in buffer
+- =R= - Rename marked files, renaming multiple is a move!
+- =% R= - Rename based on regular expression: =^test= , =old-\&=
+
+*Power command*: =C-x C-q= (=dired-toggle-read-only=) - Makes all file names in the buffer editable directly to rename them!  Press =Z Z= to confirm renaming or =Z Q= to abort.
+
+**** Deleting files
+
+- =D= - Delete marked file
+- =d= - Mark file for deletion
+- =x= - Execute deletion for marks
+- =delete-by-moving-to-trash= - Move to trash instead of deleting permanently
+
+**** Creating and extracting archives
+
+- =Z= - Compress or uncompress a file or folder to (=.tar.gz=)
+- =c= - Compress selection to a specific file
+- =dired-compress-files-alist= - Bind compression commands to file extension
+
+**** Other common operations
+
+- =T= - Touch (change timestamp)
+- =M= - Change file mode
+- =O= - Change file owner
+- =G= - Change file group
+- =S= - Create a symbolic link to this file
+- =L= - Load an Emacs Lisp file into Emacs
+
+
+*** Configuration
 
 #+begin_src emacs-lisp
 
@@ -1154,13 +1230,25 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
     (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*"))
 
   (use-package dired-single
+		:after dired
     :defer t)
 
   (use-package dired-ranger
+		:after dired
     :defer t)
 
   (use-package dired-collapse
+		:after dired
     :defer t)
+
+	(use-package dired-open
+  :commands (dired dired-jump)
+  :config
+  ;; Doesn't work as expected!
+  (add-to-list 'dired-open-functions #'dired-open-xdg t)
+  ;; (setq dired-open-extensions '(("png" . "feh")
+  ;;                               ("mkv" . "mpv")))
+	)
 
   (evil-collection-define-key 'normal 'dired-mode-map
     "h" 'dired-single-up-directory
@@ -1270,7 +1358,6 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 #+begin_src emacs-lisp
 
 (use-package org-superstar
-  :after org
   :hook (org-mode . org-superstar-mode)
   :custom
   (org-superstar-remove-leading-stars t)
@@ -1317,18 +1404,19 @@ Emacs' default buffer placement algorithm is pretty disruptive if you like setti
 
 #+begin_src emacs-lisp
 
-;; This is needed as of Org 9.2
-(require 'org-tempo)
+(with-eval-after-load 'org
+	;; This is needed as of Org 9.2
+	(require 'org-tempo)
 
-(add-to-list 'org-structure-template-alist '("sh" . "src sh"))
-(add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-(add-to-list 'org-structure-template-alist '("sc" . "src scheme"))
-(add-to-list 'org-structure-template-alist '("ts" . "src typescript"))
-(add-to-list 'org-structure-template-alist '("py" . "src python"))
-(add-to-list 'org-structure-template-alist '("go" . "src go"))
-(add-to-list 'org-structure-template-alist '("php" . "src php"))
-(add-to-list 'org-structure-template-alist '("yaml" . "src yaml"))
-(add-to-list 'org-structure-template-alist '("json" . "src json"))
+	(add-to-list 'org-structure-template-alist '("sh" . "src sh"))
+	(add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+	(add-to-list 'org-structure-template-alist '("sc" . "src scheme"))
+	(add-to-list 'org-structure-template-alist '("ts" . "src typescript"))
+	(add-to-list 'org-structure-template-alist '("py" . "src python"))
+	(add-to-list 'org-structure-template-alist '("go" . "src go"))
+	(add-to-list 'org-structure-template-alist '("php" . "src php"))
+	(add-to-list 'org-structure-template-alist '("yaml" . "src yaml"))
+	(add-to-list 'org-structure-template-alist '("json" . "src json")))
 
 #+end_src
 
@@ -1669,6 +1757,48 @@ This package makes it much easier to edit Org documents when =org-hide-emphasis-
 
 #+end_src
 
+*** Python
+
+We use =lsp-mode= and =dap-mode= to provide a more complete development environment for Python in Emacs.  Check out [[https://emacs-lsp.github.io/lsp-mode/page/lsp-pyls/][the =pyls= configuration]] in the =lsp-mode= documentation for more details.
+
+Make sure you have the =pyls= language server installed before trying =lsp-mode=!
+
+#+begin_src sh :tangle no
+
+sudo pip install "python-language-server[all]"
+sudo pip install python-lsp-server
+
+#+end_src
+
+There are a number of other language servers for Python so if you find that =pyls= doesn't work for you, consult the =lsp-mode= [[https://emacs-lsp.github.io/lsp-mode/page/languages/][language configuration documentation]] to try the others!
+
+#+begin_src emacs-lisp
+
+(use-package python-mode
+  :ensure t
+  :hook (python-mode . lsp-deferred)
+  :custom
+  ;; NOTE: Set these if Python 3 is called "python3" on your system!
+  ;; (python-shell-interpreter "python3")
+  ;; (dap-python-executable "python3")
+  (dap-python-debugger 'debugpy)
+  :config
+  (require 'dap-python))
+
+
+#+end_src
+
+You can use the pyvenv package to use =virtualenv= environments in Emacs.  The =pyvenv-activate= command should configure Emacs to cause =lsp-mode= and =dap-mode= to use the virtual environment when they are loaded, just select the path to your virtual environment before loading your project.
+
+#+begin_src emacs-lisp
+
+(use-package pyvenv
+  :after python-mode
+  :config
+  (pyvenv-mode 1))
+
+#+end_src
+
 *** Emacs Lisp
 
 #+begin_src emacs-lisp
@@ -1830,17 +1960,6 @@ This package makes it much easier to edit Org documents when =org-hide-emphasis-
 
 #+end_src
 
-*** Snippets
-
-#+begin_src emacs-lisp
-
-(use-package yasnippet
-  :hook (prog-mode . yas-minor-mode)
-  :config
-  (yas-reload-all))
-
-#+end_src
-
 *** Smart Parens
 
 #+begin_src emacs-lisp
@@ -1919,11 +2038,202 @@ This package makes it much easier to edit Org documents when =org-hide-emphasis-
 #+end_src
 
 
-* Runtime Performance
+* Term
+
+** Eshell
+
+*** Configuration
 
 #+begin_src emacs-lisp
 
-;; Make gc pauses faster by decreasing the threshold.
-;; (setq gc-cons-threshold (* 2 1000 1000))
+
+(defun read-file (file-path)
+  (with-temp-buffer
+    (insert-file-contents file-path)
+    (buffer-string)))
+
+(defun apts/get-current-package-version ()
+  (interactive)
+  (let ((package-json-file (concat (eshell/pwd) "/package.json")))
+    (when (file-exists-p package-json-file)
+      (let* ((package-json-contents (read-file package-json-file))
+             (package-json (ignore-errors (json-parse-string package-json-contents))))
+        (when package-json
+          (ignore-errors (gethash "version" package-json)))))))
+
+(defun apts/map-line-to-status-char (line)
+  (cond ((string-match "^?\\? " line) "?")))
+
+(defun apts/get-git-status-prompt ()
+  (let ((status-lines (cdr (process-lines "git" "status" "--porcelain" "-b"))))
+    (seq-uniq (seq-filter 'identity (mapcar 'apts/map-line-to-status-char status-lines)))))
+
+(defun apts/get-prompt-path ()
+  (let* ((current-path (eshell/pwd))
+         (git-output (shell-command-to-string "git rev-parse --show-toplevel"))
+         (has-path (not (string-match "^fatal" git-output))))
+    (if (not has-path)
+      (abbreviate-file-name current-path)
+      (string-remove-prefix (file-name-directory git-output) current-path))))
+
+;; This prompt function mostly replicates my custom zsh prompt setup
+;; that is powered by github.com/denysdovhan/spaceship-prompt.
+(defun apts/eshell-prompt ()
+  (let ((current-branch (magit-get-current-branch))
+        (package-version (apts/get-current-package-version)))
+    (concat
+     "\n"
+     (propertize (system-name) 'face `(:foreground "#62aeed"))
+     (propertize " (>) " 'face `(:foreground "white"))
+     (propertize (apts/get-prompt-path) 'face `(:foreground "#82cfd3"))
+     (when current-branch
+       (concat
+        (propertize " • " 'face `(:foreground "white"))
+        (propertize (concat " " current-branch) 'face `(:foreground "#c475f0"))))
+     (when package-version
+       (concat
+        (propertize " @ " 'face `(:foreground "white"))
+        (propertize package-version 'face `(:foreground "#e8a206"))))
+     (propertize " • " 'face `(:foreground "white"))
+     (propertize (format-time-string "%I:%M:%S %p") 'face `(:foreground "#5a5b7f"))
+     (if (= (user-uid) 0)
+         (propertize "\n#" 'face `(:foreground "red2"))
+       (propertize "\nλ" 'face `(:foreground "#aece4a")))
+     (propertize " " 'face `(:foreground "white")))))
+
+(defun apts/eshell-configure ()
+  (require 'evil-collection-eshell)
+  (evil-collection-eshell-setup)
+
+  (use-package xterm-color)
+
+  (push 'eshell-tramp eshell-modules-list)
+  (push 'xterm-color-filter eshell-preoutput-filter-functions)
+  (delq 'eshell-handle-ansi-color eshell-output-filter-functions)
+
+  ;; Save command history when commands are entered
+  (add-hook 'eshell-pre-command-hook 'eshell-save-some-history)
+
+  (add-hook 'eshell-before-prompt-hook
+            (lambda ()
+              (setq xterm-color-preserve-properties t)))
+
+  ;; Truncate buffer for performance
+  (add-to-list 'eshell-output-filter-functions 'eshell-truncate-buffer)
+
+  ;; We want to use xterm-256color when running interactive commands
+  ;; in eshell but not during other times when we might be launching
+  ;; a shell command to gather its output.
+  (add-hook 'eshell-pre-command-hook
+            (lambda () (setenv "TERM" "xterm-256color")))
+  (add-hook 'eshell-post-command-hook
+            (lambda () (setenv "TERM" "dumb")))
+
+  ;; Use completion-at-point to provide completions in eshell
+  (define-key eshell-mode-map (kbd "<tab>") 'completion-at-point)
+
+  ;; Initialize the shell history
+  (eshell-hist-initialize)
+
+  (evil-define-key '(normal insert visual) eshell-mode-map (kbd "C-r") 'consult-history)
+  (evil-define-key '(normal insert visual) eshell-mode-map (kbd "<home>") 'eshell-bol)
+  (evil-normalize-keymaps)
+
+  (setenv "PAGER" "cat")
+
+  (setq eshell-prompt-function      'apts/eshell-prompt
+        eshell-prompt-regexp        "^λ "
+        eshell-history-size         10000
+        eshell-buffer-maximum-lines 10000
+        eshell-hist-ignoredups t
+        eshell-highlight-prompt t
+        eshell-scroll-to-bottom-on-input t
+        eshell-prefer-lisp-functions nil))
+
+(use-package eshell
+  :hook (eshell-first-time-mode . apts/eshell-configure)
+  :init
+  (setq eshell-directory-name "~/.emacs.d/eshell/")
+        eshell-aliases-file (expand-file-name "~/.emacs.d/eshell/alias"))
+
+(use-package eshell-z
+  :hook ((eshell-mode . (lambda () (require 'eshell-z)))
+         (eshell-z-change-dir .  (lambda () (eshell/pushd (eshell/pwd))))))
+
+(use-package exec-path-from-shell
+  :init
+  (setq exec-path-from-shell-check-startup-files nil)
+  :config
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize)))
+
+(apts/leader-key-def
+  "SPC" 'eshell)
 
 #+end_src
+
+*** Better Colors
+
+#+begin_src emacs-lisp
+
+(use-package eterm-256color
+  :hook (term-mode . eterm-256color-mode))
+
+#+end_src
+
+*** Command Highlighting
+
+#+begin_src emacs-lisp
+
+(use-package eshell-syntax-highlighting
+  :after esh-mode
+  :config
+  (eshell-syntax-highlighting-global-mode +1))
+
+#+end_src
+
+*** History Autocompletion
+
+#+begin_src emacs-lisp
+
+(use-package esh-autosuggest
+  :hook (eshell-mode . esh-autosuggest-mode)
+  :config
+  (setq esh-autosuggest-delay 0.5)
+  (set-face-foreground 'company-preview-common "#4b5668")
+  (set-face-background 'company-preview nil))
+
+#+end_src
+
+*** Toggling Eshell
+
+#+begin_src emacs-lisp
+
+(use-package eshell-toggle
+  :bind ("C-M-'" . eshell-toggle)
+  :custom
+  (eshell-toggle-size-fraction 3)
+  (eshell-toggle-use-projectile-root t)
+  (eshell-toggle-run-command nil))
+
+#+end_src
+
+* Auto Update
+
+You can use =M-x auto-package-update-now= for update
+
+#+begin_src emacs-lisp
+
+(use-package auto-package-update
+  :custom
+  (auto-package-update-interval 7)
+  (auto-package-update-prompt-before-update t)
+  (auto-package-update-hide-results t))
+
+(apts/leader-key-def
+  "u"   '(:ignore t :which-key "updates")
+  "ua"  '(auto-package-update-now :which-key "auto update emacs now"))
+
+
+#+end_src
+
