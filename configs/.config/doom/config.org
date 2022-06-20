@@ -1,6 +1,14 @@
-#+title: doom emacs config
+#+title: Ali's Doom emacs config
 #+description: Improve and customize doom emacs config
 #+PROPERTY: header-args:emacs-lisp :tangle config.el
+
+
+* About this config
+This is my doom emacs config
+
+I got help from daviwil dotfiles [[https://config.daviwil.com/emacs][link]] & Derek Taylor(dt) dotfiles [[https://gitlab.com/dwt1/dotfiles][link]]
+I made custom changes to existing configurations to configure emacs as I liked
+
 
 * Exit
 
