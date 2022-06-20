@@ -1,0 +1,3 @@
+# Changing "ls" to "exa"
+alias ls exa --icons --color=always --group-directories-first $*  # my preferred listing
+
