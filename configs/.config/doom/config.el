@@ -9,36 +9,64 @@
 (global-auto-revert-mode 1)
 (setq global-auto-revert-non-file-buffers t)
 
-(use-package dashboard
-  :init      ;; tweak dashboard config before loading it
-  (setq dashboard-set-heading-icons t)
-  (setq dashboard-set-file-icons t)
-  (setq dashboard-banner-logo-title "\nKEYBINDINGS:\
-\nFind file               (SPC .)     \
-Open buffer list    (SPC b i)\
-\nFind recent files       (SPC f r)   \
-Open the eshell     (SPC e s)\
-\nOpen dired file manager (SPC d d)   \
-List of keybindings (SPC h b b)")
-  ;;(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
-  (setq dashboard-startup-banner "~/.doom.d/banner.png")  ;; use custom image as banner
-  (setq dashboard-center-content nil) ;; set to 't' for centered content
-  (setq dashboard-items '((recents . 5)
-                          (agenda . 5 )
-                          (bookmarks . 5)
-                          (projects . 5)
-                          (registers . 5)))
-  :config
-  (dashboard-setup-startup-hook)
-  (dashboard-modify-heading-icons '((recents . "file-text")
-                                    (bookmarks . "book"))))
+;; (use-package dashboard
+;;   :init      ;; tweak dashboard config before loading it
+;;   (setq dashboard-set-heading-icons t)
+;;   (setq dashboard-set-file-icons t)
+;;   (setq dashboard-banner-logo-title "\nKEYBINDINGS:\
+;; \nFind file               (SPC .)     \
+;; Open buffer list    (SPC b i)\
+;; \nFind recent files       (SPC f r)   \
+;; Open the eshell     (SPC e s)\
+;; \nOpen dired file manager (SPC d d)   \
+;; List of keybindings (SPC h b b)")
+;;   ;;(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
+;;   (setq dashboard-startup-banner "~/.doom.d/banner.png")  ;; use custom image as banner
+;;   (setq dashboard-center-content nil) ;; set to 't' for centered content
+;;   (setq dashboard-items '((recents . 5)
+;;                           (agenda . 5 )
+;;                           (bookmarks . 5)
+;;                           (projects . 5)
+;;                           (registers . 5)))
+;;   :config
+;;   (dashboard-setup-startup-hook)
+;;   (dashboard-modify-heading-icons '((recents . "file-text")
+;;                                     (bookmarks . "book"))))
 
-(setq doom-fallback-buffer-name "*dashboard*")
+(setq fancy-splash-image "~/.doom.d/banner.png")
+
+;; (setq doom-fallback-buffer-name "*dashboard*")
+(setq doom-fallback-buffer-name "*doom*")
+
+(defun +doom-dashboard/open-maybe (frame)
+  (interactive (list (selected-frame)))
+  (with-selected-frame frame
+    (switch-to-buffer (+doom-dashboard-initial-buffer))))
+(advice-add #'+doom-dashboard/open :override #'+doom-dashboard/open-maybe)
 
 (setq doom-theme 'doom-palenight)
 (doom-themes-visual-bell-config)
 (map! :leader
       :desc "Load new theme" "h t" #'counsel-load-theme)
+
+  (setq centaur-tabs-set-icons t
+        centaur-tabs-gray-out-icons 'buffer
+				centaur-tabs-style "bar"
+				centaur-tabs-set-bar 'under
+				x-underline-at-descent-line t
+        centaur-tabs-set-modified-marker t
+        centaur-tabs-close-button "x"
+        centaur-tabs-modified-marker "*"
+        centaur-tabs-cycle-scope 'tabs)
+
+(map! :leader
+      :desc "Toggle tabs globally" "t c" #'centaur-tabs-mode
+      :desc "Toggle tabs local display" "t C" #'centaur-tabs-local-mode)
+
+(evil-define-key 'normal centaur-tabs-mode-map (kbd "g <right>") 'centaur-tabs-forward        ; default Doom binding is 'g t'
+                                               (kbd "g <left>")  'centaur-tabs-backward       ; default Doom binding is 'g T'
+                                               (kbd "g <down>")  'centaur-tabs-forward-group
+                                               (kbd "g <up>")    'centaur-tabs-backward-group)
 
 (setq doom-font (font-spec :family "Fantasque Sans Mono" :size 17)
       doom-variable-pitch-font (font-spec :family "Fantasque Sans Mono" :size 17)
@@ -117,6 +145,114 @@ List of keybindings (SPC h b b)")
 (map! :leader
       :desc "Toggle neotree file viewer" "t n" #'neotree-toggle
       :desc "Open directory in neotree" "d n" #'neotree-dir)
+
+(use-package! dired
+  :defer 1
+  :commands (dired dired-jump)
+  :config
+  (setq dired-listing-switches "-agho --group-directories-first"
+        dired-omit-files "^\\.[^.].*"
+        dired-omit-verbose nil
+        dired-hide-details-hide-symlink-targets nil
+        delete-by-moving-to-trash t)
+
+  (autoload 'dired-omit-mode "dired-x")
+
+  (add-hook 'dired-load-hook
+            (lambda ()
+              (interactive)
+              (dired-collapse)))
+
+  (add-hook 'dired-mode-hook
+            (lambda ()
+              (interactive)
+ ;;             (dired-omit-mode 1)
+ ;;             (dired-hide-details-mode 1)
+              (all-the-icons-dired-mode 1)
+              (hl-line-mode 1)))
+
+  (use-package  dired-rainbow
+    :defer 2
+    :config
+    (dired-rainbow-define-chmod directory "#6cb2eb" "d.*")
+    (dired-rainbow-define html "#eb5286" ("css" "less" "sass" "scss" "htm" "html" "jhtm" "mht" "eml" "mustache" "xhtml"))
+    (dired-rainbow-define xml "#f2d024" ("xml" "xsd" "xsl" "xslt" "wsdl" "bib" "json" "msg" "pgn" "rss" "yaml" "yml" "rdata"))
+    (dired-rainbow-define document "#9561e2" ("docm" "doc" "docx" "odb" "odt" "pdb" "pdf" "ps" "rtf" "djvu" "epub" "odp" "ppt" "pptx"))
+    (dired-rainbow-define markdown "#ffed4a" ("org" "etx" "info" "markdown" "md" "mkd" "nfo" "pod" "rst" "tex" "textfile" "txt"))
+    (dired-rainbow-define database "#6574cd" ("xlsx" "xls" "csv" "accdb" "db" "mdb" "sqlite" "nc"))
+    (dired-rainbow-define media "#de751f" ("mp3" "mp4" "mkv" "MP3" "MP4" "avi" "mpeg" "mpg" "flv" "ogg" "mov" "mid" "midi" "wav" "aiff" "flac"))
+    (dired-rainbow-define image "#f66d9b" ("tiff" "tif" "cdr" "gif" "ico" "jpeg" "jpg" "png" "psd" "eps" "svg"))
+    (dired-rainbow-define log "#c17d11" ("log"))
+    (dired-rainbow-define shell "#f6993f" ("awk" "bash" "bat" "sed" "sh" "zsh" "vim"))
+    (dired-rainbow-define interpreted "#38c172" ("py" "ipynb" "rb" "pl" "t" "msql" "mysql" "pgsql" "sql" "r" "clj" "cljs" "scala" "js"))
+    (dired-rainbow-define compiled "#4dc0b5" ("asm" "cl" "lisp" "el" "c" "h" "c++" "h++" "hpp" "hxx" "m" "cc" "cs" "cp" "cpp" "go" "f" "for" "ftn" "f90" "f95" "f03" "f08" "s" "rs" "hi" "hs" "pyc" ".java"))
+    (dired-rainbow-define executable "#8cc4ff" ("exe" "msi"))
+    (dired-rainbow-define compressed "#51d88a" ("7z" "zip" "bz2" "tgz" "txz" "gz" "xz" "z" "Z" "jar" "war" "ear" "rar" "sar" "xpi" "apk" "xz" "tar"))
+    (dired-rainbow-define packaged "#faad63" ("deb" "rpm" "apk" "jad" "jar" "cab" "pak" "pk3" "vdf" "vpk" "bsp"))
+    (dired-rainbow-define encrypted "#ffed4a" ("gpg" "pgp" "asc" "bfe" "enc" "signature" "sig" "p12" "pem"))
+    (dired-rainbow-define fonts "#6cb2eb" ("afm" "fon" "fnt" "pfb" "pfm" "ttf" "otf"))
+    (dired-rainbow-define partition "#e3342f" ("dmg" "iso" "bin" "nrg" "qcow" "toast" "vcd" "vmdk" "bak"))
+    (dired-rainbow-define vc "#0074d9" ("git" "gitignore" "gitattributes" "gitmodules"))
+    (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*"))
+
+  (use-package dired-single
+		:after dired
+    :defer t)
+
+  (use-package dired-ranger
+		:after dired
+    :defer t)
+
+  (use-package dired-collapse
+		:after dired
+    :defer t)
+
+	(use-package dired-open
+  :commands (dired dired-jump)
+  :config
+  ;; Doesn't work as expected!
+  (add-to-list 'dired-open-functions #'dired-open-xdg t)
+  ;; (setq dired-open-extensions '(("png" . "feh")
+  ;;                               ("mkv" . "mpv")))
+	)
+
+  (evil-collection-define-key 'normal 'dired-mode-map
+    "h" 'dired-single-up-directory
+    "H" 'dired-omit-mode
+    "l" 'dired-single-buffer
+    "y" 'dired-ranger-copy
+    "X" 'dired-ranger-move
+    "p" 'dired-ranger-paste))
+
+(use-package openwith
+  :config
+  (setq openwith-associations
+        (list
+          (list (openwith-make-extension-regexp
+                '("mpg" "mpeg" "mp3" "mp4"
+                  "avi" "wmv" "wav" "mov" "flv"
+                  "ogm" "ogg" "mkv"))
+                "mpv"
+                '(file))
+          (list (openwith-make-extension-regexp
+                '("xbm" "pbm" "pgm" "ppm" "pnm"
+                  "png" "gif" "bmp" "tif" "jpeg")) ;; Removed jpg because Telega was
+                  ;; causing feh to be opened...
+                  "feh"
+                  '(file))
+          (list (openwith-make-extension-regexp
+                '("pdf"))
+                "zathura"
+                '(file)))))
+
+(map! :leader
+      (:prefix ("d" . "dired")
+       :desc "Open dired" "d" #'dired
+       :desc "Dired jump to current" "j" #'dired-jump)
+      (:after dired
+       (:map dired-mode-map
+        :desc "Peep-dired image previews" "d p" #'peep-dired
+        :desc "Dired view file" "d v" #'dired-view-file)))
 
 (defun apts/org-mode-visual-fill ()
   (setq visual-fill-column-width 110
@@ -213,7 +349,7 @@ List of keybindings (SPC h b b)")
   (add-to-list 'org-structure-template-alist '("yaml" . "src yaml"))
   (add-to-list 'org-structure-template-alist '("json" . "src json")))
 
-(defun apts/org-start-presentation ()
+ (defun apts/org-start-presentation ()
   (interactive)
   (org-tree-slide-mode 1)
   (setq text-scale-mode-amount 3)
