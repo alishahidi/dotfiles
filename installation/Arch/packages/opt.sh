@@ -1,1 +1,0 @@
-pacman -S python python-pip php php-gd php-imagick composer nodejs rust neovim uget aria2 emacs python-jedi telegram-desktop openvpn networkmanager-openvpn reflector libreoffice-fresh thunderbird filezilla gparted vpnc tor gimp rsync qbittorrent vlc mpv nomacs mupdf atril phodav
