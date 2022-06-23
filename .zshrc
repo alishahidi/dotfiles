@@ -7,6 +7,7 @@ source $ZSH/oh-my-zsh.sh
 source $HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 export PATH=$HOME/.local/bin:$HOME/.local/lib/python3.9/site-packages/*:$PATH
 alias ls="exa --icons"
+alias emacs="emacsclient -c -a 'emacs'"
 clear
 figlet "#: $USER;" | lolcat
 
