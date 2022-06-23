@@ -9,4 +9,7 @@ export PATH=/home/ali/.local/bin:/home/ali/.local/lib/python3.9/site-packages/*:
 export FZF_DEFAULT_COMMAND='fdfind --type f'
 export FZF_DEFAULT_OPTS='--layout=reverse --inline-info --height=80%'
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+alias ls="exa --icons"
 clear
+figlet "#: Ali;" | lolcat
+

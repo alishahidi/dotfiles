@@ -346,3 +346,4 @@ exec xautolock -detectsleep -time 15 -locker "/home/ali/.config/scripts/blur-loc
 ##-- Autostart ---------------------------
 
 exec_always --no-startup-id 	~/.config/i3/bin/autostart.sh
+exec /usr/bin/emacs --daemon
