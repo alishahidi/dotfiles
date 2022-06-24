@@ -22,15 +22,17 @@ floating_modifier $mod
 
 # start a terminal
 bindsym $mod+Return exec alacritty
+bindsym $mod+Shift+Return exec emacsclient -c -a 'emacs'
 
 # kill focused window
 bindsym $mod+Shift+q kill
 
 # start dmenu (a program launcher)
 #bindsym $mod+d exec --no-startup-id dmenu_run -fn "Droid Sans Regular"
+bindsym $mod+d exec --no-startup-id dmenu_run -bw 1 -l 4 -g 4 -p "Run: "
 #bindsym $mod+d exec --no-startup-id dmenu_run -b -fn "Droid Sans Regular"
 #bindsym $mod+d exec ./.config/rofi/launchers/text/launcher.sh
-bindsym $mod+d exec "rofi -modi drun,run -show drun"
+#bindsym $mod+d exec "rofi -modi drun,run -show drun"
 # A more modern dmenu replacement is rofi:
 # bindcode $mod+40 exec "rofi -modi drun,run -show drun"
 # There also is i3-dmenu-desktop which only displays applications shipping a
@@ -286,25 +288,7 @@ mode "$mode_gaps_left" {
         bindsym Escape mode "default"
 }
 
-
-
-# Windows Colors
-set $bgcolor	#1d1f21
-set $ibgcolor	#363636
-set $fws	#1d1f21
-set $barcolor	#1d1f21
-set $textcolor	#EEEEEE
-set $itextcolor #969696
-set $ubgcolor	#FF0000
-
 ##-- Colors ------------------------------
-
-# class                 border  backgr. text    indicator child_border
-# client.focused          #c5c8c6 #1d1f21 #c5c8c6 #81a2be #81a2be
-# client.focused_inactive #c5c8c6 #1d1f21 #c5c8c6 #5f819d #5f819d
-# client.unfocused        #c5c8c6 #1d1f21 #c5c8c6 #5f819d #5f819d
-# client.urgent           #c5c8c6 #1d1f21 #c5c8c6 #5f819d #5f819d
-# client.placeholder      #c5c8c6 #1d1f21 #c5c8c6 #5f819d #5f819d
 
 client.focused          #6272A4 #6272A4 #F8F8F2 #6272A4   #F8F8F2
 client.focused_inactive #44475A #44475A #F8F8F2 #44475A   #44475A
@@ -318,11 +302,11 @@ client.background       #1E222A
 
 # Start i3bar to display a workspace bar (plus the system information i3status
 bar {
-	status_command i3blocks -c /home/ali/.config/i3blocks/i3blocks.conf
+	status_command i3blocks -c $HOME/.config/i3blocks/i3blocks.conf
 	separator_symbol "|"
 	tray_output primary
 	position top
-	font pango:Inconsolata, FontAwesome Bold 12 
+	font pango:Inconsolata Nerd Font Bold 12
         colors {
                 background #1d1f21
                 statusline #F8F8F2
@@ -336,14 +320,31 @@ bar {
         }
 }
 
-bindsym $mod+x exec /home/ali/.config/scripts/blur-lock
-bindsym Print exec scrot ~/%Y-%m-%d-%T-screenshot.png && notify-send "Screenshot saved to ~/$(date +"%Y-%m-%d-%T")-screenshot.png"
-bindsym $mod+Shift+w exec feh --bg-fill --randomize /home/ali/Pictures/Wallpapers
-exec xautolock -detectsleep -time 15 -locker "/home/ali/.config/scripts/blur-lock" \
+bindsym $mod+x exec $HOME/.config/scripts/blur-lock
+bindsym Print exec $HOME/.config/scripts/screenshot
+bindsym $mod+Shift+w exec feh --bg-fill --randomize $HOME/Pictures/Wallpapers
+
+exec xautolock -detectsleep -time 15 -locker "$HOME/.config/scripts/blur-lock" \
   -notify 30 \
   -notifier "notify-send -u critical -t 10000 -- 'locking screen in 30 seconds'"
 
 ##-- Autostart ---------------------------
 
-exec_always --no-startup-id 	~/.config/i3/bin/autostart.sh
+# Once
+
+# Fix cursor
+exec xsetroot -cursor_name left_ptr
+exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+exec ~/.config/scripts/comp
 exec /usr/bin/emacs --daemon
+exec autotiling
+exec blueberry-tray
+exec cbatticon
+exec volumeicon
+exec xfce4-clipman
+exec nm-applet
+
+# Always
+
+exec_always feh --bg-fill --randomize /home/ali/Pictures/Wallpapers
+exec_always --no-startup-id  ~/.config/i3/bin/autostart.sh

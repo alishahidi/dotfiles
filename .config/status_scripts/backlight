@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+# Show the screen brightness value given by `xbacklight`.
+# Clicking uses `xset` to turn off the backlight, scrolling increases or decreases
+# the brightness.
+
+case $BLOCK_BUTTON in
+  3) xset dpms force off ;; # right click
+  4) brightnessctl s +5% ;; # scroll up
+  5) brightnessctl s 5%- ;; # scroll down, decrease
+esac
+
+
+BRIGHTNESS=$(xbacklight -get | cut -f1 -d'.')
+echo "${BRIGHTNESS}%"

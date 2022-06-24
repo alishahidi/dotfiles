@@ -70,7 +70,7 @@ volume() {
 }
 
 format() {
-  
+
   perl_filter='if (/.*\[(\d+%)\] (\[(-?\d+.\d+dB)\] )?\[(on|off)\]/)'
   perl_filter+='{CORE::say $4 eq "off" ? "MUTE" : "'
   # If dB was selected, print that instead
