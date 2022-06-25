@@ -87,3 +87,4 @@
 (package! dired-open)
 (package! openwith)
 (package! css-format)
+(package! htmlize)

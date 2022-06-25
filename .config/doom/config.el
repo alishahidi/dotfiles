@@ -49,7 +49,7 @@
 (map! :leader
       :desc "Load new theme" "h t" #'counsel-load-theme)
 
-  (setq centaur-tabs-set-icons t
+(setq centaur-tabs-set-icons t
         centaur-tabs-gray-out-icons 'buffer
 				centaur-tabs-style "bar"
 				centaur-tabs-set-bar 'under
@@ -329,6 +329,58 @@
 (use-package ox-man)
 (use-package ox-gemini)
 
+(setq org-html-validation-link nil)
+
+;; Define the publishing project
+(setq org-publish-project-alist
+      (list
+       (list "org-site:main"
+             :recursive t
+             ;; Start org publish comman if you are in org files directory
+             ;; or change base directory
+             :base-directory "./"
+             :publishing-function 'org-html-publish-to-html
+             :publishing-directory "./../public"
+             :with-author nil           ;; Don't include author name
+             :with-creator t            ;; Include Emacs and Org versions in footer
+             :with-toc t                ;; Include a table of contents
+             :section-numbers nil       ;; Don't include section numbers
+             :time-stamp-file nil)))    ;; Don't include time stamp in file
+
+;; Customize the HTML output
+(setq org-html-validation-link nil            ;; Don't show validation link
+      org-html-head-include-scripts nil       ;; Use our own scripts
+      org-html-head-include-default-style nil ;; Use our own styles
+
+      ;; if you want use simplecss with nice and clean output
+      ;; org-html-head "<link rel=\"stylesheet\" href=\"https://cdn.simplecss.org/simple.min.css\" />"
+
+      ;; if you want use custom css
+      ;; org-html-head "<link rel=\"stylesheet\" href=\"css/main.css\" />"
+
+      )
+
+;; If You wants use light theme go into main.css and uncomment html dark theme section (marked with comment)
+
+(defun apts/org-inline-css-hook (exporter)
+  "Insert custom inline css"
+  (when (eq exporter 'html)
+    (let* ((dir (ignore-errors (file-name-directory (buffer-file-name))))
+           (path (concat dir "style.css"))
+           (homestyle (or (null dir) (null (file-exists-p path))))
+           (final (if homestyle "~/.config/doom/org-publish/css/main.css" path))) ;; <- set your own style file path
+      (setq org-html-head-include-default-style nil)
+      (setq org-html-head (concat
+                           "<style type=\"text/css\">\n"
+                           "<!--/*--><![CDATA[/*><!--*/\n"
+                           (with-temp-buffer
+                             (insert-file-contents final)
+                             (buffer-string))
+                           "/*]]>*/-->\n"
+                           "</style>\n")))))
+
+(add-hook 'org-export-before-processing-hook 'apts/org-inline-css-hook)
+
 (use-package! org-auto-tangle
   :defer t
   :hook (org-mode . org-auto-tangle-mode)
@@ -349,7 +401,7 @@
   (add-to-list 'org-structure-template-alist '("yaml" . "src yaml"))
   (add-to-list 'org-structure-template-alist '("json" . "src json")))
 
- (defun apts/org-start-presentation ()
+(defun apts/org-start-presentation ()
   (interactive)
   (org-tree-slide-mode 1)
   (setq text-scale-mode-amount 3)
