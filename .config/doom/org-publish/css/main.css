@@ -326,3 +326,39 @@ body {
   text-decoration: underline;
   font-size: .9rem;
 }
+
+table {
+	display: block;
+	overflow-x: scroll;
+	border: none;
+}
+
+thead {
+	background: var(--foreground-primary);
+	font-family: "vazirmatn-bold";
+	font-weight: 700;
+	color: var(--background-primary);
+	font-size: 20px;
+}
+
+th {
+	padding: 4px 9px;
+	border-right: 1px solid var(--background-tertiary);
+}
+
+tbody {
+	background: var(--action-primary);
+	font-family: "vazirmatn-medium";
+	font-weight: 500;
+	font-size: 16px;
+	text-align: center;
+}
+
+tr {
+	border-bottom: 1px solid var(--background-tertiary);
+}
+
+td {
+	padding: 8px 9px;
+	border-right: 1px solid var(--background-tertiary);
+}
