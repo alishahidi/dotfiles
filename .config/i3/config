@@ -337,7 +337,7 @@ exec xsetroot -cursor_name left_ptr
 exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 exec ~/.config/scripts/comp
 exec /usr/bin/emacs --daemon
-exec autotiling
+exec ~/.config/scripts/autotiling
 exec blueberry-tray
 exec cbatticon
 exec volumeicon
