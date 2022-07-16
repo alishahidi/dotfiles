@@ -44,12 +44,12 @@
     (switch-to-buffer (+doom-dashboard-initial-buffer))))
 (advice-add #'+doom-dashboard/open :override #'+doom-dashboard/open-maybe)
 
-(setq doom-theme 'doom-palenight)
+(setq doom-theme 'doom-dracula)
 (doom-themes-visual-bell-config)
 (map! :leader
       :desc "Load new theme" "h t" #'counsel-load-theme)
 
-(setq centaur-tabs-set-icons t
+  (setq centaur-tabs-set-icons t
         centaur-tabs-gray-out-icons 'buffer
 				centaur-tabs-style "bar"
 				centaur-tabs-set-bar 'under
@@ -401,7 +401,7 @@
   (add-to-list 'org-structure-template-alist '("yaml" . "src yaml"))
   (add-to-list 'org-structure-template-alist '("json" . "src json")))
 
-(defun apts/org-start-presentation ()
+ (defun apts/org-start-presentation ()
   (interactive)
   (org-tree-slide-mode 1)
   (setq text-scale-mode-amount 3)

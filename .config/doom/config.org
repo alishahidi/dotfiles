@@ -100,7 +100,7 @@ I made custom changes to existing configurations to configure emacs as I liked
 
 #+begin_src emacs-lisp
 
-(setq doom-theme 'doom-palenight)
+(setq doom-theme 'doom-dracula)
 (doom-themes-visual-bell-config)
 (map! :leader
       :desc "Load new theme" "h t" #'counsel-load-theme)
