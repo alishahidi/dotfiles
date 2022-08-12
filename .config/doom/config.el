@@ -68,9 +68,9 @@
                                                (kbd "g <down>")  'centaur-tabs-forward-group
                                                (kbd "g <up>")    'centaur-tabs-backward-group)
 
-(setq doom-font (font-spec :family "Fantasque Sans Mono" :size 17)
-      doom-variable-pitch-font (font-spec :family "Fantasque Sans Mono" :size 17)
-      doom-big-font (font-spec :family "Fantasque Sans Mono" :size 24))
+(setq doom-font (font-spec :family "Fantasque Sans Mono" :size 19)
+      doom-variable-pitch-font (font-spec :family "Fantasque Sans Mono" :size 19)
+      doom-big-font (font-spec :family "Fantasque Sans Mono" :size 26))
 (after! doom-themes
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t))
@@ -85,8 +85,8 @@
   (super-save-mode +1)
   (setq super-save-auto-save-when-idle t))
 
-(set-frame-parameter (selected-frame) 'alpha '(90 . 90))
-(add-to-list 'default-frame-alist '(alpha . (90 . 90)))
+(set-frame-parameter (selected-frame) 'alpha '(80 . 80))
+(add-to-list 'default-frame-alist '(alpha . (80 . 80)))
 
 (setq-default tab-width 2)
 (setq-default evil-shift-width tab-width)
@@ -398,6 +398,7 @@
   (add-to-list 'org-structure-template-alist '("py" . "src python"))
   (add-to-list 'org-structure-template-alist '("go" . "src go"))
   (add-to-list 'org-structure-template-alist '("php" . "src php"))
+  (add-to-list 'org-structure-template-alist '("html" . "src html"))
   (add-to-list 'org-structure-template-alist '("yaml" . "src yaml"))
   (add-to-list 'org-structure-template-alist '("json" . "src json")))
 
