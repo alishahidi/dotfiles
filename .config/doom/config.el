@@ -102,6 +102,8 @@ List of keybindings (SPC h b b)")
         neo-window-fixed-size nil))
 (after! doom-themes
   (setq doom-neotree-enable-variable-pitch t))
+(doom-themes-neotree-config)
+(setq doom-themes-neotree-file-icons t)
 (map! :leader
       :desc "Toggle neotree file viewer" "t n" #'neotree-toggle
       :desc "Open directory in neotree" "d n" #'neotree-dir)
@@ -313,7 +315,7 @@ List of keybindings (SPC h b b)")
   (add-to-list 'org-structure-template-alist '("yaml" . "src yaml"))
   (add-to-list 'org-structure-template-alist '("json" . "src json")))
 
-(defun apts/org-start-presentation ()
+ (defun apts/org-start-presentation ()
   (interactive)
   (org-tree-slide-mode 1)
   (setq text-scale-mode-amount 3)
