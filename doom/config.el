@@ -1,57 +1,13 @@
-#+title: Ali's Doom emacs config
-#+description: Improve and customize doom emacs config
-#+PROPERTY: header-args:emacs-lisp :tangle config.el
-
-
-* About this config
-This is my doom emacs config
-
-I got help from daviwil dotfiles [[https://config.daviwil.com/emacs][link]] & Derek Taylor(dt) dotfiles [[https://gitlab.com/dwt1/dotfiles][link]]
-I made custom changes to existing configurations to configure emacs as I liked
-
-
-* Exit
-
-#+begin_src emacs-lisp
-
 ;; fix xclip problem on emacs quit
 (setq x-select-enable-clipboard-manager nil)
 
-#+end_src
-
-* Keyboard Bindings
-
-** ESC Cancels All
-
-#+begin_src emacs-lisp
-
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-
-#+end_src
-
-* User Info
-
-#+begin_src emacs-lisp
 
 (setq user-full-name "Ali Shahidi"
       user-mail-address "alishahidi1376@gmail.com")
 
-#+end_src
-
-* Global Auto Revert
-
-#+begin_src emacs-lisp
-
 (global-auto-revert-mode 1)
 (setq global-auto-revert-non-file-buffers t)
-
-#+end_src
-
-* Dashboard
-
-** Configuration
-
-#+begin_src emacs-lisp
 
 (use-package dashboard
   :init      ;; tweak dashboard config before loading it
@@ -77,35 +33,16 @@ List of keybindings (SPC h b b)")
   (dashboard-modify-heading-icons '((recents . "file-text")
                                     (bookmarks . "book"))))
 
-
-#+end_src
-
-** Dashboard in Emacsclient
-
-#+begin_src emacs-lisp
-
 (setq fancy-splash-image "~/.config/doom/banner.png")
 
-#+end_src
-
-* Doom Theme
-
-#+begin_src emacs-lisp
-
-(setq doom-theme 'doom-one)
+(setq doom-theme 'doom-gruvbox)
 (doom-themes-visual-bell-config)
 (map! :leader
       :desc "Load new theme" "h t" #'counsel-load-theme)
 
-#+end_src
-
-* Fonts
-
-#+begin_src emacs-lisp
-
-(setq doom-font (font-spec :family "JetBrains Mono" :size 15)
+(setq doom-font (font-spec :family "Source Code Pro" :size 15)
       doom-variable-pitch-font (font-spec :family "Ubuntu" :size 15)
-      doom-big-font (font-spec :family "JetBrains Mono" :size 24))
+      doom-big-font (font-spec :family "Source Code Pro" :size 24))
 (after! doom-themes
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t))
@@ -113,19 +50,7 @@ List of keybindings (SPC h b b)")
   '(font-lock-comment-face :slant italic)
   '(font-lock-keyword-face :slant italic))
 
-#+end_src
-
-* Word wrap
-
-#+begin_src emacs-lisp
-
 (setq global-visual-line-mode t)
-
-#+end_src
-
-* Auto Saving Changed Files
-
-#+begin_src emacs-lisp
 
 (use-package super-save
   :defer 1
@@ -134,50 +59,18 @@ List of keybindings (SPC h b b)")
   (super-save-mode +1)
   (setq super-save-auto-save-when-idle t))
 
-#+end_src
-
-* Set transparency
-
-#+begin_src emacs-lisp
-
 (set-frame-parameter (selected-frame) 'alpha '(90 . 90))
 (add-to-list 'default-frame-alist '(alpha . (90 . 90)))
-
-#+end_src
-
-* Editing Configuration
-
-** Tab Widths
-
-#+begin_src emacs-lisp
 
 (setq-default tab-width 2)
 (setq-default evil-shift-width tab-width)
 
-#+end_src
-
-** Commenting Lines
-
-#+begin_src emacs-lisp
-
 (use-package! evil-nerd-commenter
   :bind ("M-/" . evilnc-comment-or-uncomment-lines))
-
-#+end_src
-
-** Automaticy clean whitespace
-
-#+begin_src emacs-lisp
 
 (use-package ws-butler
   :hook ((text-mode . ws-butler-mode)
          (prog-mode . ws-butler-mode)))
-
-#+end_src
-
-* Line Settings
-
-#+begin_src emacs-lisp
 
 (column-number-mode)
 
@@ -199,22 +92,10 @@ List of keybindings (SPC h b b)")
        :desc "Toggle line highlight globally" "H" #'global-hl-line-mode
        :desc "Toggle truncate lines" "t" #'toggle-truncate-lines))
 
-#+end_src
-
-* ModeLine
-
-#+begin_src emacs-lisp
-
 (setq doom-modeline-height 25     ;; sets modeline height
       doom-modeline-bar-width 5   ;; sets right bar width
       doom-modeline-persp-name t  ;; adds perspective name to modeline
       doom-modeline-persp-icon t) ;; adds folder icon next to persp name
-
-#+end_src
-
-* Neotree
-
-#+begin_src emacs-lisp
 
 (after! neotree
   (setq neo-smart-open t
@@ -226,72 +107,6 @@ List of keybindings (SPC h b b)")
 (map! :leader
       :desc "Toggle neotree file viewer" "t n" #'neotree-toggle
       :desc "Open directory in neotree" "d n" #'neotree-dir)
-
-#+end_src
-
-* Dired
-** Key Bindings
-
-*** Navigation
-
-*Emacs* / *Evil*
-- =n= / =j= - next line
-- =p= / =k= - previous line
-- =j= / =J= - jump to file in buffer
-- =RET= - select file or directory
-- =^= - go to parent directory
-- =S-RET= / =g O= - Open file in "other" window
-- =M-RET= - Show file in other window without focusing (previewing files)
-- =g o= (=dired-view-file=) - Open file but in a "preview" mode, close with =q=
-- =g= / =g r= Refresh the buffer with =revert-buffer= after changing configuration (and after filesystem changes!)
-
-*** Marking files
-
-- =m= - Marks a file
-- =u= - Unmarks a file
-- =U= - Unmarks all files in buffer
-- =* t= / =t= - Inverts marked files in buffer
-- =% m= - Mark files in buffer using regular expression
-- =*= - Lots of other auto-marking functions
-- =k= / =K= - "Kill" marked items (refresh buffer with =g= / =g r= to get them back)
-- Many operations can be done on a single file if there are no active marks!
-
-*** Copying and Renaming files
-
-- =C= - Copy marked files (or if no files are marked, the current file)
-- Copying single and multiple files
-- =U= - Unmark all files in buffer
-- =R= - Rename marked files, renaming multiple is a move!
-- =% R= - Rename based on regular expression: =^test= , =old-\&=
-
-*Power command*: =C-x C-q= (=dired-toggle-read-only=) - Makes all file names in the buffer editable directly to rename them!  Press =Z Z= to confirm renaming or =Z Q= to abort.
-
-*** Deleting files
-
-- =D= - Delete marked file
-- =d= - Mark file for deletion
-- =x= - Execute deletion for marks
-- =delete-by-moving-to-trash= - Move to trash instead of deleting permanently
-
-*** Creating and extracting archives
-
-- =Z= - Compress or uncompress a file or folder to (=.tar.gz=)
-- =c= - Compress selection to a specific file
-- =dired-compress-files-alist= - Bind compression commands to file extension
-
-*** Other common operations
-
-- =T= - Touch (change timestamp)
-- =M= - Change file mode
-- =O= - Change file owner
-- =G= - Change file group
-- =S= - Create a symbolic link to this file
-- =L= - Load an Emacs Lisp file into Emacs
-
-
-** Configuration
-
-#+begin_src emacs-lisp
 
 (map! :leader
       (:prefix ("d" . "dired")
@@ -321,11 +136,6 @@ List of keybindings (SPC h b b)")
                               ("png" . "sxiv")
                               ("mkv" . "mpv")
                               ("mp4" . "mpv")))
-#+end_src
-
-** Opening Files Externally
-
-#+begin_src emacs-lisp
 
 (use-package openwith
   :config
@@ -348,13 +158,6 @@ List of keybindings (SPC h b b)")
                 "zathura"
                 '(file)))))
 
-#+end_src
-
-** Bind
-
-
-#+begin_src emacs-lisp
-
 (map! :leader
       (:prefix ("d" . "dired")
        :desc "Open dired" "d" #'dired
@@ -364,41 +167,28 @@ List of keybindings (SPC h b b)")
         :desc "Peep-dired image previews" "d p" #'peep-dired
         :desc "Dired view file" "d v" #'dired-view-file)))
 
-#+end_src
+;; (defun apts/org-mode-visual-fill ()
+;;   (setq visual-fill-column-width 110
+;;         visual-fill-column-center-text t)
+;;   (visual-fill-column-mode 1))
 
-* Set Margins for Modes
+;; (defun apts/prog-mode-visual-fill ()
+;;   (setq visual-fill-column-width 200
+;;         visual-fill-column-center-text t)
+;;   (visual-fill-column-mode 1))
 
-#+begin_src emacs-lisp
-
-(defun apts/org-mode-visual-fill ()
-  (setq visual-fill-column-width 110
-        visual-fill-column-center-text t)
-  (visual-fill-column-mode 1))
-
-(defun apts/prog-mode-visual-fill ()
-  (setq visual-fill-column-width 200
-        visual-fill-column-center-text t)
-  (visual-fill-column-mode 1))
-
-(use-package visual-fill-column
-  :defer t
-  :hook (org-mode . apts/org-mode-visual-fill)
-  (prog-mode . apts/prog-mode-visual-fill))
-
-#+end_src
-
-* Org mode
-
-** Configuration
-
-#+begin_src emacs-lisp
+;; (use-package visual-fill-column
+;;   :defer t
+;;   :hook (org-mode . apts/org-mode-visual-fill)
+;;   (prog-mode . apts/prog-mode-visual-fill))
 
 (map! :leader
       :desc "Org babel tangle" "m B" #'org-babel-tangle)
 (after! org
   (setq org-ellipsis " ▼ "
+        org-ellipsis " ▼ "
         org-superstar-headline-bullets-list '("◉" "●" "○" "◆" "●" "○" "◆")
-        org-superstar-item-bullet-alist '((?+ . ?➤) (?- . ?✦)) ; changes +/- symbols in item lists
+        org-superstar-itembullet-alist '((?+ . ?➤) (?- . ?✦)) ; changes +/- symbols in item lists
         org-log-done 'time
         org-hide-emphasis-markers t
         ;; ex. of org-link-abbrev-alist in action
@@ -420,12 +210,6 @@ List of keybindings (SPC h b b)")
              "|"                 ; The pipe necessary to separate "active" states and "inactive" states
              "DONE(d)"           ; Task has been completed
              "CANCELLED(c)" )))) ; Task has been cancelled
-
-#+end_src
-
-** Set font sizes for each header level in Org
-
-#+begin_src emacs-lisp
 
 (custom-set-faces
   '(org-level-1 ((t (:inherit outline-1 :height 1.2))))
@@ -456,21 +240,8 @@ List of keybindings (SPC h b b)")
 (set-face-attribute 'org-column nil :background nil)
 (set-face-attribute 'org-column-title nil :background nil)
 
-#+end_src
-
-
-** Org-export
-
-#+begin_src emacs-lisp
-
 (use-package ox-man)
 (use-package ox-gemini)
-
-#+end_src
-
-** Org publish
-
-#+begin_src emacs-lisp
 
 (setq org-html-validation-link nil)
 
@@ -524,24 +295,11 @@ List of keybindings (SPC h b b)")
 
 (add-hook 'org-export-before-processing-hook 'apts/org-inline-css-hook)
 
-
-#+end_src
-
-** Org-auto-tangle
-
-#+begin_src emacs-lisp
-
 (use-package! org-auto-tangle
   :defer t
   :hook (org-mode . org-auto-tangle-mode)
   :config
   (setq org-auto-tangle-default t))
-
-#+end_src
-
-** Org tempo
-
-#+begin_src emacs-lisp
 
 (with-eval-after-load 'org
   ;; This is needed as of Org 9.2
@@ -558,13 +316,7 @@ List of keybindings (SPC h b b)")
   (add-to-list 'org-structure-template-alist '("yaml" . "src yaml"))
   (add-to-list 'org-structure-template-alist '("json" . "src json")))
 
-#+end_src
-
-** Org tree slide
-
-#+begin_src emacs-lisp
-
- (defun apts/org-start-presentation ()
+(defun apts/org-start-presentation ()
   (interactive)
   (org-tree-slide-mode 1)
   (setq text-scale-mode-amount 3)
@@ -589,24 +341,12 @@ List of keybindings (SPC h b b)")
         org-tree-slide-deactivate-message "Presentation ended."
         org-tree-slide-header t))
 
-#+end_src
-
-* Rainbow Mode
-
-#+begin_src emacs-lisp
-
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
 
 (define-globalized-minor-mode global-rainbow-mode rainbow-mode
   (lambda () (rainbow-mode 1)))
 (global-rainbow-mode 1 )
-
-#+end_src
-
-* Shell
-
-#+begin_src emacs-lisp
 
 (setq shell-file-name "/bin/zsh"
       vterm-max-scrollback 5000)
@@ -624,14 +364,6 @@ List of keybindings (SPC h b b)")
       :desc "Counsel eshell history" "e h" #'counsel-esh-history
       :desc "Vterm popup toggle" "v t" #'+vterm/toggle)
 
-#+end_src
-
-* Splits
-
-I set splits to default to opening on the right using ‘prefer-horizontal-split’.  I set a keybinding for ‘clone-indirect-buffer-other-window’ for when I want to have the same document in two splits.  The text of the indirect buffer is always identical to the text of its base buffer; changes made by editing either one are visible immediately in the other.  But in all other respects, the indirect buffer and its base buffer are completely separate.  For example, I can fold one split but other will be unfolded.
-
-#+begin_src emacs-lisp
-
 (defun prefer-horizontal-split ()
   (set-variable 'split-height-threshold nil t)
   (set-variable 'split-width-threshold 40 t)) ; make this as low as needed
@@ -639,17 +371,7 @@ I set splits to default to opening on the right using ‘prefer-horizontal-split
 (map! :leader
       :desc "Clone indirect buffer other window" "b c" #'clone-indirect-buffer-other-window)
 
-#+end_src
-
-* Winner mode
-
-Winner mode has been included with GNU Emacs since version 20.  This is a global minor mode and, when activated, it allows you to “undo” (and “redo”) changes in the window configuration with the key commands ‘SCP w <left>’ and ‘SPC w <right>’.
-
-#+begin_src emacs-lisp
-
 (map! :leader
       (:prefix ("w" . "window")
        :desc "Winner redo" "<right>" #'winner-redo
        :desc "Winner undo" "<left>" #'winner-undo))
-
-#+end_src
