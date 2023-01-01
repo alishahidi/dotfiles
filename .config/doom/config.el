@@ -35,7 +35,7 @@ List of keybindings (SPC h b b)")
 
 (setq fancy-splash-image "~/.config/doom/banner.png")
 
-(setq doom-theme 'doom-one)
+(setq doom-theme 'doom-dracula)
 (doom-themes-visual-bell-config)
 (map! :leader
       :desc "Load new theme" "h t" #'counsel-load-theme)
@@ -59,8 +59,8 @@ List of keybindings (SPC h b b)")
   (super-save-mode +1)
   (setq super-save-auto-save-when-idle t))
 
-(set-frame-parameter (selected-frame) 'alpha '(99 . 99))
-(add-to-list 'default-frame-alist '(alpha . (99 . 99)))
+(set-frame-parameter (selected-frame) 'alpha '(94 . 94))
+(add-to-list 'default-frame-alist '(alpha . (94 . 94)))
 
 (setq-default tab-width 2)
 (setq-default evil-shift-width tab-width)
@@ -316,7 +316,7 @@ List of keybindings (SPC h b b)")
   (add-to-list 'org-structure-template-alist '("yaml" . "src yaml"))
   (add-to-list 'org-structure-template-alist '("json" . "src json")))
 
- (defun apts/org-start-presentation ()
+(defun apts/org-start-presentation ()
   (interactive)
   (org-tree-slide-mode 1)
   (setq text-scale-mode-amount 3)
