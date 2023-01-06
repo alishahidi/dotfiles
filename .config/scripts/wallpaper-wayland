@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+PICTURE=/tmp/wallpaper.png
+RANDOM_WALLPAPER=$(find ~/Pictures/Wallpapers -name '*jpg' | shuf -n 1)
+
+convert $RANDOM_WALLPAPER $PICTURE
+swaybg -i $PICTURE -m fill
+
+rm $PICTURE

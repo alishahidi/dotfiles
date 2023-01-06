@@ -1,0 +1,31 @@
+#!/bin/sh
+
+
+case "$1" in
+    lock)
+	~/.config/scripts/blur-lock
+	;;
+    lock-wayland)
+	~/.config/scripts/blur-lock-wayland
+        ;;
+    logout)
+        i3-msg exit
+        ;;
+    suspend)
+        systemctl suspend
+        ;;
+    hibernate)
+        systemctl hibernate
+        ;;
+    reboot)
+        systemctl reboot
+        ;;
+    shutdown)
+        systemctl poweroff
+        ;;
+    *)
+        echo "Usage: $0 {lock|lock-wayland|logout|suspend|hibernate|reboot|shutdown}"
+        exit 2
+esac
+
+exit 0

@@ -22,16 +22,16 @@ bindsym $mod+9 workspace 9
 bindsym $mod+0 workspace 10
 
 # move focused container to workspace
-bindsym $mod+Shift+1 move container to workspace 1; workspace 1
-bindsym $mod+Shift+2 move container to workspace 2; workspace 2
-bindsym $mod+Shift+3 move container to workspace 3; workspace 3
-bindsym $mod+Shift+4 move container to workspace 4; workspace 4
-bindsym $mod+Shift+5 move container to workspace 5; workspace 5
-bindsym $mod+Shift+6 move container to workspace 6; workspace 6
-bindsym $mod+Shift+7 move container to workspace 7; workspace 7
-bindsym $mod+Shift+8 move container to workspace 8; workspace 8
-bindsym $mod+Shift+9 move container to workspace 9; workspace 9
-bindsym $mod+Shift+0 move container to workspace 10; workspace 10
+bindsym $mod+Shift+1 move container to workspace 1;
+bindsym $mod+Shift+2 move container to workspace 2;
+bindsym $mod+Shift+3 move container to workspace 3;
+bindsym $mod+Shift+4 move container to workspace 4;
+bindsym $mod+Shift+5 move container to workspace 5;
+bindsym $mod+Shift+6 move container to workspace 6;
+bindsym $mod+Shift+7 move container to workspace 7;
+bindsym $mod+Shift+8 move container to workspace 8;
+bindsym $mod+Shift+9 move container to workspace 9;
+bindsym $mod+Shift+0 move container to workspace 10;
 
 # start dmenu
 #bindsym $mod+d exec --no-startup-id dmenu_run -i -nb '#191919' -nf '#fea63c' -sb '#fea63c' -sf '#191919' -fn 'NotoMonoRegular:bold:pixelsize=14'
@@ -39,16 +39,15 @@ bindsym $mod+d exec --no-startup-id dmenu_run -bw 1 -l 4 -g 4 -p "Run: "
 
 ################# how to exit, logoff, suspend, ...
 
-bindsym $mod+x mode "$mode_system"
-
-set $mode_system System (k) lock, (l) logout, (u) suspend, (h) hibernate, (r) reboot, (s) shutdown
-mode "$mode_system" {
-    bindsym k exec --no-startup-id ~/.config/i3/scripts/i3exit.sh lock, mode "default"
-    bindsym l exec --no-startup-id ~/.config/i3/scripts/i3exit.sh logout, mode "default"
-    bindsym u exec --no-startup-id ~/.config/i3/scripts/i3exit.sh suspend, mode "default"
-    bindsym h exec --no-startup-id ~/.config/i3/scripts/i3exit.sh hibernate, mode "default"
-    bindsym r exec --no-startup-id ~/.config/i3/scripts/i3exit.sh reboot, mode "default"
-    bindsym s exec --no-startup-id ~/.config/i3/scripts/i3exit.sh shutdown, mode "default"
+set $mode_system "System (k) lock, (l) logout, (u) suspend, (h) hibernate, (r) reboot, (s) shutdown"
+bindsym $mod+x mode $mode_system
+mode $mode_system {
+    bindsym k exec --no-startup-id ~/.config/scripts/sys-process lock, mode "default"
+    bindsym l exec --no-startup-id ~/.config/scripts/sys-process logout, mode "default"
+    bindsym u exec --no-startup-id ~/.config/scripts/sys-process suspend, mode "default"
+    bindsym h exec --no-startup-id ~/.config/scripts/sys-process hibernate, mode "default"
+    bindsym r exec --no-startup-id ~/.config/scripts/sys-process reboot, mode "default"
+    bindsym s exec --no-startup-id ~/.config/scripts/sys-process shutdown, mode "default"
 
     # back to normal: Enter or Escape
     bindsym Return mode "default"
@@ -110,8 +109,6 @@ bindsym $mod+Tab workspace back_and_forth
 bindsym Mod1+Ctrl+Right workspace next
 bindsym Mod1+Ctrl+Left workspace prev
 
-# switch to workspace with urgent window automatically
-for_window [urgent=latest] focus
 
 ################# Tiling parameters                
 
