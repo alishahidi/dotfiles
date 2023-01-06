@@ -1,0 +1,6 @@
+#!/bin/env bash
+
+CURRENT_DATE=$(date +"%Y-%m-%d-%T")
+IMAGE_PATH="$HOME/Pictures/$CURRENT_DATE-screenshot.png"
+
+grim $IMAGE_PATH && notify-send "Screenshot saved to $IMAGE_PATH"

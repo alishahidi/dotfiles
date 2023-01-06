@@ -57,6 +57,8 @@ List of keybindings (SPC h b b)")
 
 (set-frame-parameter (selected-frame) 'alpha '(94 . 94))
 (add-to-list 'default-frame-alist '(alpha . (94 . 94)))
+;; wayland support
+(set-frame-parameter nil 'alpha-background 94)
 
 (setq-default tab-width 2)
 (setq-default evil-shift-width tab-width)

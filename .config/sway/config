@@ -172,7 +172,7 @@ font pango:Inconsolata Nerd Font Bold 13
     bindsym mod1+Shift+Delete exec --no-startup-id xfce4-taskmanager;focus
     bindsym $mod+Shift+s exec --no-startup-id xfce4-settings-manager
     bindsym --release $mod+Escape exec xkill
-    bindsym Print exec --no-startup-id flameshot gui
+    bindsym Print exec ~/.config/scripts/screenshot-wayland
     bindsym $mod+Shift+w exec ~/.config/scripts/wallpaper-wayland
 
 #
@@ -354,7 +354,6 @@ exec --no-startup-id blueberry-tray
 exec --no-startup-id nm-applet --indicator
 exec_always --no-startup-id numlockx on
 exec --no-startup-id volumeicon
-exec ~/.config/scripts/comp
 exec /usr/bin/emacs --daemon
 exec xsetroot -cursor_name left_ptr
 exec cbatticon
