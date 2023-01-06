@@ -24,25 +24,21 @@ List of keybindings (SPC h b b)")
   (setq dashboard-startup-banner "~/.config/doom/banner.png")  ;; use custom image as banner
   (setq dashboard-center-content nil) ;; set to 't' for centered content
   (setq dashboard-items '((recents . 5)
-                          (agenda . 5 )
-                          (bookmarks . 5)
-                          (projects . 5)
-                          (registers . 5)))
+                          (projects . 5)))
   :config
   (dashboard-setup-startup-hook)
-  (dashboard-modify-heading-icons '((recents . "file-text")
-                                    (bookmarks . "book"))))
+  (dashboard-modify-heading-icons '((recents . "file-text"))))
 
 (setq fancy-splash-image "~/.config/doom/banner.png")
 
-(setq doom-theme 'doom-dracula)
+(setq doom-theme 'doom-palenight)
 (doom-themes-visual-bell-config)
 (map! :leader
       :desc "Load new theme" "h t" #'counsel-load-theme)
 
-(setq doom-font (font-spec :family "JetBrains Mono" :size 15)
+(setq doom-font (font-spec :family "Jetbrains Mono" :size 15)
       doom-variable-pitch-font (font-spec :family "Ubuntu" :size 15)
-      doom-big-font (font-spec :family "JetBrains Mono" :size 24))
+      doom-big-font (font-spec :family "Jetbrains Mono" :size 24))
 (after! doom-themes
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t))
@@ -167,20 +163,20 @@ List of keybindings (SPC h b b)")
         :desc "Peep-dired image previews" "d p" #'peep-dired
         :desc "Dired view file" "d v" #'dired-view-file)))
 
-;; (defun apts/org-mode-visual-fill ()
-;;   (setq visual-fill-column-width 110
-;;         visual-fill-column-center-text t)
-;;   (visual-fill-column-mode 1))
+(defun apts/org-mode-visual-fill ()
+  (setq visual-fill-column-width 110
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
 
-;; (defun apts/prog-mode-visual-fill ()
-;;   (setq visual-fill-column-width 200
-;;         visual-fill-column-center-text t)
-;;   (visual-fill-column-mode 1))
+(defun apts/prog-mode-visual-fill ()
+  (setq visual-fill-column-width 200
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
 
-;; (use-package visual-fill-column
-;;   :defer t
-;;   :hook (org-mode . apts/org-mode-visual-fill)
-;;   (prog-mode . apts/prog-mode-visual-fill))
+(use-package visual-fill-column
+  :defer t
+  :hook (org-mode . apts/org-mode-visual-fill)
+  (prog-mode . apts/prog-mode-visual-fill))
 
 (map! :leader
       :desc "Org babel tangle" "m B" #'org-babel-tangle)

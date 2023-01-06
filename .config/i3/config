@@ -9,17 +9,6 @@ set $down k
 set $left j
 set $right semicolon 
 
-################# Single and Dual screen
-
-# current displays
-exec --no-startup-id xrandr --output DP0 --right-of HDMI-0 --auto
-
-
-# current setup
-
-set $firstMonitor HDMI-1
-set $secondMonitor HDMI-2
-
 # switch to workspace
 bindsym $mod+1 workspace 1
 bindsym $mod+2 workspace 2
@@ -160,11 +149,11 @@ bindsym $mod+Ctrl+Up resize grow height 1 px or 1 ppt
 bindsym $mod+Ctrl+Down resize shrink height 1 px or 1 ppt
 bindsym $mod+Ctrl+Left resize grow width 1 px or 1 ppt
 
-font pango:Noto Mono Regular 13
+font pango:Inconsolata Nerd Font Bold 13
 
 ################# autostart - execute applications at boot time
 
-exec --no-startup-id ~/.config/scripts/autotiling
+exec_always --no-startup-id ~/.config/scripts/autotiling
 exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 exec --no-startup-id pamac-tray
 exec --no-startup-id blueberry-tray
@@ -245,21 +234,15 @@ for_window [class="Terminator"] focus
 for_window [class="Urxvt"] focus
 for_window [class="Alacritty"] focus
 
-
 ################# audio settings                   
 
 bindsym XF86AudioRaiseVolume exec --no-startup-id "amixer -D pulse sset Master '5%+'"
 bindsym XF86AudioLowerVolume exec --no-startup-id "amixer -D pulse sset Master '5%-'"
 bindsym XF86AudioMute exec --no-startup-id "amixer -D pulse set Master toggle"
-# https://github.com/acrisci/playerctl/
 bindsym XF86AudioPlay exec --no-startup-id playerctl play-pause
 bindsym XF86AudioNext exec --no-startup-id playerctl next
 bindsym XF86AudioPrev exec --no-startup-id playerctl previous
 bindsym XF86AudioStop exec --no-startup-id playerctl stop
-# bindsym XF86AudioPlay exec --no-startup-id "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlayPause"
-# bindsym XF86AudioNext exec --no-startup-id "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Next"
-# bindsym XF86AudioPrev exec --no-startup-id "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Previous"
-# bindsym XF86AudioStop exec --no-startup-id "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Stop"
 
 ################# xbacklight                       
 
@@ -285,23 +268,11 @@ new_window normal
 new_float normal
 # new_float none
 
-################# Popups  control                  
-
-# Popups during fullscreen mode
-popup_during_fullscreen smart
-
-################# i3 gaps next                     
-
-# Settings for I3 next gap git
-# https://github.com/Airblader/i3/tree/gaps-next
-# delete or uncomment the following lines if you do not have it or do not
-# want it
-
-for_window [class="^.*"] border pixel 2
+for_window [class="^.*"] border pixel 1
 gaps inner 5
 gaps outer 5
-# smart_gaps on
-# smart_borders on
+smart_gaps on
+smart_borders on
 
 ################# i3 gaps change                   
 
@@ -341,6 +312,9 @@ mode "$mode_gaps_outer" {
         bindsym Return mode "default"
         bindsym Escape mode "default"
 }
+
+
+
 
 ################# bar appearance                   
 
