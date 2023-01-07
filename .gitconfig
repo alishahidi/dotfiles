@@ -1,0 +1,6 @@
+[user]
+	email = alishahidi1376@gmail.com
+	name = Ali Shahidi
+[core]
+	editor = vim
+	autocrlf = input
