@@ -1,10 +1,11 @@
-set number
+:set number
 :set mouse=a
 :set autoindent
 :set tabstop=4
 :set shiftwidth=4
 :set smarttab
 :set softtabstop=4
+let &t_ut=''
 
 call plug#begin()
 
