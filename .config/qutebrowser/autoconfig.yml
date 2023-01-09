@@ -10,6 +10,8 @@ settings:
     https://soft98.ir: false
     https://toplearn.com: true
     https://www.sarzamindownload.com: false
+  content.proxy:
+    global: system
   content.register_protocol_handler:
     https://mail.google.com?extsrc=mailto&url=%25s: true
   downloads.prevent_mixed_content:
