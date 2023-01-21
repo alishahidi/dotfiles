@@ -87,3 +87,6 @@
 (package! openwith)
 (package! css-format)
 (package! htmlize)
+(package! ivy-posframe)
+(package! beacon)
+(package! emojify)
