@@ -161,10 +161,11 @@ exec ~/.config/scripts/comp
 exec /usr/bin/emacs --daemon
 exec xsetroot -cursor_name left_ptr
 exec cbatticon
+exec diskie -t
 exec xfce4-clipman
 exec --no-startup-id xfce4-power-manager &
 exec --no-startup-id /usr/lib/xfce4/notifyd/xfce4-notifyd &
-exec_always feh --bg-fill --randomize /home/ali/Pictures/Wallpapers
+exec_always feh --bg-fill --randomize ~/Pictures/Wallpapers
 
 exec xautolock -detectsleep -time 15 -locker "$HOME/.config/scripts/blur-lock" \
   -notify 30 \
@@ -178,7 +179,7 @@ bindsym mod1+Shift+Delete exec --no-startup-id xfce4-taskmanager;focus
 bindsym $mod+Shift+s exec --no-startup-id xfce4-settings-manager
 bindsym --release $mod+Escape exec xkill
 bindsym Print exec --no-startup-id flameshot gui
-bindsym $mod+Shift+w exec feh --bg-fill --randomize $HOME/Pictures/Wallpapers
+bindsym $mod+Shift+w exec feh --bg-fill --randomize ~/Pictures/Wallpapers
 
 ################# floating or tiled rules         
 
