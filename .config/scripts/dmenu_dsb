@@ -1,0 +1,26 @@
+#!/bin/bash
+
+desktop_files=$(find /usr/share/applications/ -name "*.desktop")
+
+# Extract the name of the application and full path of the .desktop file
+applications=$(echo "$desktop_files" | awk -F= '{print $1}')
+
+# Add the executables from /usr/bin/ to the list of applications
+bin_files=$(find /usr/bin/ -type f -executable -printf '%f\n')
+applications="$applications $bin_files"
+
+#Remove duplicate apps
+applications=$(echo "$applications" | tr " " "\n" | awk '!seen[$0]++')
+
+# Launch dmenu
+selected_app=$(dmenu -bw 1 -l 6 -g 4 -p "Run: " -i <<< "$applications")
+
+# Check if the selected file is a desktop file or a binary file
+if [[ $selected_app == *".desktop"* ]]; then
+    # Open the selected desktop file with xdg-open
+    command=$(grep -r "^Exec=" "$selected_app" | awk -F= '{print $2}' | awk '{print $1}' | head -1)
+    $command & 
+else
+    # Execute the selected binary file
+    $selected_app &
+fi

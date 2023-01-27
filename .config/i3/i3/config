@@ -1,0 +1,351 @@
+set $mod Mod4
+
+################# Define the movements keys - variables
+
+# This is setup for qwerty
+# set $right to m if using azerty keyboard
+set $up l
+set $down k
+set $left j
+set $right semicolon 
+
+# switch to workspace
+bindsym $mod+1 workspace 1
+bindsym $mod+2 workspace 2
+bindsym $mod+3 workspace 3
+bindsym $mod+4 workspace 4
+bindsym $mod+5 workspace 5
+bindsym $mod+6 workspace 6
+bindsym $mod+7 workspace 7
+bindsym $mod+8 workspace 8
+bindsym $mod+9 workspace 9
+bindsym $mod+0 workspace 10
+
+# move focused container to workspace
+bindsym $mod+Shift+1 move container to workspace 1;
+bindsym $mod+Shift+2 move container to workspace 2;
+bindsym $mod+Shift+3 move container to workspace 3;
+bindsym $mod+Shift+4 move container to workspace 4;
+bindsym $mod+Shift+5 move container to workspace 5;
+bindsym $mod+Shift+6 move container to workspace 6;
+bindsym $mod+Shift+7 move container to workspace 7;
+bindsym $mod+Shift+8 move container to workspace 8;
+bindsym $mod+Shift+9 move container to workspace 9;
+bindsym $mod+Shift+0 move container to workspace 10;
+
+# start dmenu
+#bindsym $mod+d exec --no-startup-id dmenu_run -i -nb '#191919' -nf '#fea63c' -sb '#fea63c' -sf '#191919' -fn 'NotoMonoRegular:bold:pixelsize=14'
+#bindsym $mod+d exec --no-startup-id dmenu_run -bw 1 -l 4 -g 4 -p "Run: "
+bindsym $mod+d exec --no-startup-id ~/.config/scripts/dmenu_dsb
+
+################# how to exit, logoff, suspend, ...
+
+set $mode_system "System (k) lock, (l) logout, (u) suspend, (h) hibernate, (r) reboot, (s) shutdown"
+bindsym $mod+x mode $mode_system
+mode $mode_system {
+    bindsym k exec --no-startup-id ~/.config/scripts/sys-process lock, mode "default"
+    bindsym l exec --no-startup-id ~/.config/scripts/sys-process logout, mode "default"
+    bindsym u exec --no-startup-id ~/.config/scripts/sys-process suspend, mode "default"
+    bindsym h exec --no-startup-id ~/.config/scripts/sys-process hibernate, mode "default"
+    bindsym r exec --no-startup-id ~/.config/scripts/sys-process reboot, mode "default"
+    bindsym s exec --no-startup-id ~/.config/scripts/sys-process shutdown, mode "default"
+
+    # back to normal: Enter or Escape
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+
+################# reload changed configuration     
+
+# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $mod+Shift+r restart
+# reload the configuration file
+bindsym $mod+Shift+c reload
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
+
+################# Stopping an application          
+
+# kill focused window
+bindsym $mod+Shift+q kill
+bindsym $mod+q kill
+
+################# Moving around in i3              
+
+# Use Mouse+$mod to drag floating windows to their wanted position
+floating_modifier $mod
+
+# change focus
+bindsym $mod+$left focus left
+bindsym $mod+$down focus down
+bindsym $mod+$up focus up
+bindsym $mod+$right focus right
+
+# alternatively, you can use the cursor keys:
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# move focused window
+bindsym $mod+Shift+$left move left
+bindsym $mod+Shift+$down move down
+bindsym $mod+Shift+$up move up
+bindsym $mod+Shift+$right move right
+
+# alternatively, you can use the cursor keys:
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+################# moving around workspaces         
+
+# next/previous workspace
+
+bindsym Mod1+Tab workspace next
+bindsym Mod1+Shift+Tab workspace prev
+bindsym $mod+Tab workspace back_and_forth
+
+# navigate workspaces next / previous
+bindsym Mod1+Ctrl+Right workspace next
+bindsym Mod1+Ctrl+Left workspace prev
+
+
+################# Tiling parameters                
+
+# orientation for new workspaces
+default_orientation horizontal
+
+# split in horizontal orientation
+bindsym $mod+h split h
+
+# split in vertical orientation
+bindsym $mod+v split v
+
+# enter fullscreen mode for the focused container
+bindsym $mod+f fullscreen toggle
+
+# change container layout (stacked, tabbed, toggle split)
+bindsym $mod+s layout stacking
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout toggle split
+
+# toggle tiling / floating
+bindsym $mod+Shift+space floating toggle
+
+# change focus between tiling / floating windows
+bindsym $mod+space focus mode_toggle
+
+# focus the parent container
+bindsym $mod+a focus parent
+
+################# resize  
+
+# Resizing by 1
+bindsym $mod+Ctrl+Right resize shrink width 1 px or 1 ppt
+bindsym $mod+Ctrl+Up resize grow height 1 px or 1 ppt
+bindsym $mod+Ctrl+Down resize shrink height 1 px or 1 ppt
+bindsym $mod+Ctrl+Left resize grow width 1 px or 1 ppt
+
+font pango:Inconsolata Nerd Font Bold 13
+
+################# autostart - execute applications at boot time
+
+exec_always --no-startup-id ~/.config/scripts/autotiling
+exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
+exec --no-startup-id pamac-tray
+exec --no-startup-id blueberry-tray
+exec --no-startup-id nm-applet
+exec_always --no-startup-id numlockx on
+exec --no-startup-id volumeicon
+exec ~/.config/scripts/comp
+exec /usr/bin/emacs --daemon
+exec xsetroot -cursor_name left_ptr
+exec cbatticon
+exec diskie -t
+exec xfce4-clipman
+exec --no-startup-id xfce4-power-manager &
+exec --no-startup-id /usr/lib/xfce4/notifyd/xfce4-notifyd &
+exec_always feh --bg-fill --randomize ~/Pictures/Wallpapers
+
+exec xautolock -detectsleep -time 15 -locker "$HOME/.config/scripts/blur-lock" \
+  -notify 30 \
+  -notifier "notify-send -u critical -t 10000 -- 'locking screen in 30 seconds'"
+
+################# applications keyboard shortcuts  
+
+bindsym $mod+Return exec --no-startup-id kitty;focus
+bindsym $mod+Shift+Return exec emacsclient -c -a 'emacs';focus
+bindsym mod1+Shift+Delete exec --no-startup-id xfce4-taskmanager;focus
+bindsym $mod+Shift+s exec --no-startup-id xfce4-settings-manager
+bindsym --release $mod+Escape exec xkill
+bindsym Print exec --no-startup-id flameshot gui
+bindsym $mod+Shift+w exec feh --bg-fill --randomize ~/Pictures/Wallpapers
+
+################# floating or tiled rules         
+
+# floating enabled from some programs - find with xprop
+for_window [class="Bleachbit"] floating disable
+for_window [class="Blueberry.py"] floating enable
+for_window [class="Brasero"] floating disable
+for_window [class="Galculator"] floating enable
+for_window [class="Gnome-disks"] floating disable
+for_window [class="^Gnome-font-viewer$"] floating enable
+for_window [class="^Gpick$"] floating enable
+for_window [class="Hexchat"] floating disable
+for_window [class="Imagewriter"] floating enable
+for_window [class="Font-manager"] floating enable
+# for_window [class="qt5ct|Lxappearance] floating enable
+for_window [class="Nitrogen"] floating disable
+for_window [class="Pavucontrol"] floating disable
+for_window [class="Peek"] floating enable
+for_window [class="^Skype$"] floating enable
+for_window [class="^Spotify$"] floating disable
+for_window [class="System-config-printer.py"] floating enable
+for_window [class="Unetbootin.elf"] floating enable
+for_window [class="Usb-creator-gtk"] floating enable
+for_window [class="^Vlc$"] floating disable
+for_window [class="Wine"] floating disable
+for_window [class="Xfburn"] floating disable
+for_window [class="Xfce4-appfinder"] floating enable
+for_window [class="Xfce4-settings-manager"] floating disable
+for_window [class="Xfce4-taskmanager"] floating enable
+
+# for_window [instance="gimp"] floating disable
+for_window [instance="script-fu"] border normal
+for_window [instance="variety"] floating disable
+
+for_window [title="Copying"] floating enable
+for_window [title="Deleting"] floating enable
+for_window [title="Moving"] floating enable
+for_window [title="^Terminator Preferences$"] floating enable
+
+# for_window [window_role="^gimp-toolbox-color-dialog$"] floating enable
+for_window [window_role="pop-up"] floating enable
+for_window [window_role="^Preferences$"] floating enable
+for_window [window_role="setup"] floating enable
+
+################# give focus to applications       
+
+for_window [class="Gnome-terminal"] focus
+for_window [class="Termite"] focus
+for_window [class="Terminator"] focus
+for_window [class="Urxvt"] focus
+for_window [class="Alacritty"] focus
+
+################# audio settings                   
+
+bindsym XF86AudioRaiseVolume exec --no-startup-id "amixer -D pulse sset Master '5%+'"
+bindsym XF86AudioLowerVolume exec --no-startup-id "amixer -D pulse sset Master '5%-'"
+bindsym XF86AudioMute exec --no-startup-id "amixer -D pulse set Master toggle"
+bindsym XF86AudioPlay exec --no-startup-id playerctl play-pause
+bindsym XF86AudioNext exec --no-startup-id playerctl next
+bindsym XF86AudioPrev exec --no-startup-id playerctl previous
+bindsym XF86AudioStop exec --no-startup-id playerctl stop
+
+################# xbacklight                       
+
+bindsym XF86MonBrightnessUp exec brightnessctl s +5% && pkill -RTMIN+13 i3blocks
+bindsym XF86MonBrightnessDown exec brightnessctl s 5%- && pkill -RTMIN+13 i3blocks
+
+################# bar toggle                       
+
+# bar toggle, hide or show
+bindsym $mod+b bar mode toggle
+
+################# border control                   
+
+# Border control
+hide_edge_borders both
+bindsym $mod+shift+b exec --no-startup-id i3-msg border toggle
+
+# new_window pixel 1
+new_window normal
+# new_window none
+
+# new_float pixel 1
+new_float normal
+# new_float none
+
+for_window [class="^.*"] border pixel 1
+gaps inner 5
+gaps outer 5
+smart_gaps on
+smart_borders on
+
+################# i3 gaps change                   
+
+set $mode_gaps Gaps: (o) outer, (i) inner
+set $mode_gaps_outer Outer Gaps: +|-|0 (local), Shift + +|-|0 (global)
+set $mode_gaps_inner Inner Gaps: +|-|0 (local), Shift + +|-|0 (global)
+bindsym $mod+Shift+g mode "$mode_gaps"
+
+mode "$mode_gaps" {
+        bindsym o      mode "$mode_gaps_outer"
+        bindsym i      mode "$mode_gaps_inner"
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+}
+
+mode "$mode_gaps_inner" {
+        bindsym plus  gaps inner current plus 5
+        bindsym minus gaps inner current minus 5
+        bindsym 0     gaps inner current set 0
+
+        bindsym Shift+plus  gaps inner all plus 5
+        bindsym Shift+minus gaps inner all minus 5
+        bindsym Shift+0     gaps inner all set 0
+
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+}
+mode "$mode_gaps_outer" {
+        bindsym plus  gaps outer current plus 5
+        bindsym minus gaps outer current minus 5
+        bindsym 0     gaps outer current set 0
+
+        bindsym Shift+plus  gaps outer all plus 5
+        bindsym Shift+minus gaps outer all minus 5
+        bindsym Shift+0     gaps outer all set 0
+
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+}
+
+
+
+
+################# bar appearance                   
+
+bar {
+	status_command i3blocks -c $HOME/.config/i3blocks/i3blocks.conf
+	separator_symbol "|"
+	tray_output primary
+	position top
+	font pango:Inconsolata Nerd Font Bold 12
+    height 25
+    workspace_buttons yes
+
+  colors {
+    background #282A36
+    statusline #F8F8F2
+    separator  #44475A
+
+    focused_workspace  #44475A #44475A #F8F8F2
+    active_workspace   #282A36 #44475A #F8F8F2
+    inactive_workspace #282A36 #282A36 #BFBFBF
+    urgent_workspace   #FF5555 #FF5555 #F8F8F2
+    binding_mode       #FF5555 #FF5555 #F8F8F2
+  }
+}
+
+##-- Colors ------------------------------
+
+# class                 border  bground text    indicator child_border
+client.focused          #6272A4 #6272A4 #F8F8F2 #6272A4   #6272A4
+client.focused_inactive #44475A #44475A #F8F8F2 #44475A   #44475A
+client.unfocused        #282A36 #282A36 #BFBFBF #282A36   #282A36
+client.urgent           #44475A #FF5555 #F8F8F2 #FF5555   #FF5555
+client.placeholder      #282A36 #282A36 #F8F8F2 #282A36   #282A36
+
+client.background       #F8F8F2
