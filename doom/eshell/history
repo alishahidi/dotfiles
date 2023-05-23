@@ -1,0 +1,4 @@
+sudo pacman -Sy
+zsh
+neofetch 
+figlet "Ali on emacs" | lolcat

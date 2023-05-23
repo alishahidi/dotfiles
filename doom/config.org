@@ -1,0 +1,801 @@
+#+title: Ali's Doom emacs config
+#+description: Improve and customize doom emacs config
+#+PROPERTY: header-args:emacs-lisp :tangle config.el
+
+
+* About this config
+This is my doom emacs config
+
+I got help from daviwil dotfiles [[https://config.daviwil.com/emacs][link]] & Derek Taylor(dt) dotfiles [[https://gitlab.com/dwt1/dotfiles][link]]
+I made custom changes to existing configurations to configure emacs as I liked
+
+
+* Exit
+
+#+begin_src emacs-lisp
+
+;; fix xclip problem on emacs quit
+(setq x-select-enable-clipboard-manager nil)
+
+#+end_src
+
+* Keyboard Bindings
+
+** ESC Cancels All
+
+#+begin_src emacs-lisp
+
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+#+end_src
+
+* User Info
+
+#+begin_src emacs-lisp
+
+(setq user-full-name "Ali Shahidi"
+      user-mail-address "alishahidi1376@gmail.com")
+
+#+end_src
+
+* Global Auto Revert
+
+#+begin_src emacs-lisp
+
+(global-auto-revert-mode 1)
+(setq global-auto-revert-non-file-buffers t)
+
+#+end_src
+
+* START PAGE
+
+#+begin_src emacs-lisp
+(setq initial-buffer-choice "~/.config/doom/start.org")
+
+(define-minor-mode start-mode
+  "Provide functions for custom start page."
+  :lighter " start"
+  :keymap (let ((map (make-sparse-keymap)))
+          ;;(define-key map (kbd "M-z") 'eshell)
+            (evil-define-key 'normal start-mode-map
+              (kbd "1") '(lambda () (interactive) (find-file "~/.config/doom/config.org"))
+              (kbd "2") '(lambda () (interactive) (find-file "~/.config/doom/init.el"))
+              (kbd "3") '(lambda () (interactive) (find-file "~/.config/doom/packages.el"))
+              (kbd "4") '(lambda () (interactive) (find-file "~/.config/doom/eshell/aliases"))
+              (kbd "5") '(lambda () (interactive) (find-file "~/.config/doom/eshell/profile")))
+          map))
+
+(add-hook 'start-mode-hook 'read-only-mode) ;; make start.org read-only; use 'SPC t r' to toggle off read-only.
+(provide 'start-mode)
+#+end_src
+
+* Doom Theme
+
+#+begin_src emacs-lisp
+
+(setq doom-theme 'doom-one)
+(doom-themes-visual-bell-config)
+(map! :leader
+      :desc "Load new theme" "h t" #'counsel-load-theme)
+
+#+end_src
+
+* Fonts
+
+#+begin_src emacs-lisp
+
+(setq doom-font (font-spec :family "Jetbrains Mono" :size 17)
+      doom-variable-pitch-font (font-spec :family "Ubuntu" :size 17)
+      doom-big-font (font-spec :family "Jetbrains Mono" :size 24))
+(after! doom-themes
+  (setq doom-themes-enable-bold t
+        doom-themes-enable-italic t))
+(custom-set-faces!
+  '(font-lock-comment-face :slant italic)
+  '(font-lock-keyword-face :slant italic))
+
+#+end_src
+
+
+* BUFFERS
+
+** Buffers
+Regarding /buffers/, the text you are editing in Emacs resides in an object called a /buffer/. Each time you visit a file, a buffer is used to hold the file’s text. Each time you invoke Dired, a buffer is used to hold the directory listing.  /Ibuffer/ is a program that lists all of your Emacs /buffers/, allowing you to navigate between them and filter them.
+
+| COMMAND         | DESCRIPTION          | KEYBINDING |
+|-----------------+----------------------+------------|
+| ibuffer         | /Launch ibuffer/       | SPC b i    |
+| kill-buffer     | /Kill current buffer/  | SPC b k    |
+| next-buffer     | /Goto next buffer/     | SPC b n    |
+| previous-buffer | /Goto previous buffer/ | SPC b p    |
+| save-buffer     | /Save current buffer/  | SPC b s    |
+
+** Keybindings within ibuffer mode
+| COMMAND                           | DESCRIPTION                            | KEYBINDING |
+|-----------------------------------+----------------------------------------+------------|
+| ibuffer-mark-forward              | /Mark the buffer/                        | m          |
+| ibuffer-unmark-forward            | /Unmark the buffer/                      | u          |
+| ibuffer-do-kill-on-deletion-marks | /Kill the marked buffers/                | x          |
+| ibuffer-filter-by-content         | /Ibuffer filter by content/              | f c        |
+| ibuffer-filter-by-directory       | /Ibuffer filter by directory/            | f d        |
+| ibuffer-filter-by-filename        | /Ibuffer filter by filename (full path)/ | f f        |
+| ibuffer-filter-by-mode            | /Ibuffer filter by mode/                 | f m        |
+| ibuffer-filter-by-name            | /Ibuffer filter by name/                 | f n        |
+| ibuffer-filter-disable            | /Disable ibuffer filter/                 | f x        |
+| ibuffer-do-kill-lines             | /Hide marked buffers/                    | g h        |
+| ibuffer-update                    | /Restore hidden buffers/                 | g H        |
+
+#+begin_src emacs-lisp
+(evil-define-key 'normal ibuffer-mode-map
+  (kbd "f c") 'ibuffer-filter-by-content
+  (kbd "f d") 'ibuffer-filter-by-directory
+  (kbd "f f") 'ibuffer-filter-by-filename
+  (kbd "f m") 'ibuffer-filter-by-mode
+  (kbd "f n") 'ibuffer-filter-by-name
+  (kbd "f x") 'ibuffer-filter-disable
+  (kbd "g h") 'ibuffer-do-kill-lines
+  (kbd "g H") 'ibuffer-update)
+#+end_src
+
+* CLIPPY
+Gives us a popup box with "Clippy, the paper clip". You can make him say various things by calling 'clippy-say' function.  But the more useful functions of clippy are the two describe functions provided: 'clippy-describe-function' and 'clippy-describe-variable'.  Hit the appropriate keybinding while the point is over a function/variable to call it.  A popup with helpful clippy will appear, telling you about the function/variable (using describe-function and describe-variable respectively).
+
+| COMMAND                  | DESCRIPTION                           | KEYBINDING |
+|--------------------------+---------------------------------------+------------|
+| clippy-describe-function | /Clippy describes function under point/ | SPC c h f  |
+| clippy-describe-variable | /Clippy describes variable under point/ | SPC c h v  |
+
+#+begin_src emacs-lisp
+(map! :leader
+      (:prefix ("c h" . "Help info from Clippy")
+       :desc "Clippy describes function under point" "f" #'clippy-describe-function
+       :desc "Clippy describes variable under point" "v" #'clippy-describe-variable))
+
+#+end_src
+
+* Word wrap
+
+#+begin_src emacs-lisp
+
+(setq global-visual-line-mode t)
+
+#+end_src
+
+* Auto Saving Changed Files
+
+#+begin_src emacs-lisp
+
+(use-package super-save
+  :defer 1
+  :diminish super-save-mode
+  :config
+  (super-save-mode +1)
+  (setq super-save-auto-save-when-idle t))
+
+#+end_src
+
+* Set transparency
+
+#+begin_src emacs-lisp
+
+(set-frame-parameter (selected-frame) 'alpha '(94 . 94))
+(add-to-list 'default-frame-alist '(alpha . (94 . 94)))
+;; wayland support
+(set-frame-parameter nil 'alpha-background 94)
+
+#+end_src
+
+* Editing Configuration
+
+** Tab Widths
+
+#+begin_src emacs-lisp
+
+(setq-default tab-width 2)
+(setq-default evil-shift-width tab-width)
+
+#+end_src
+
+** Commenting Lines
+
+#+begin_src emacs-lisp
+
+(use-package! evil-nerd-commenter
+  :bind ("M-/" . evilnc-comment-or-uncomment-lines))
+
+#+end_src
+
+** Automaticy clean whitespace
+
+#+begin_src emacs-lisp
+
+(use-package ws-butler
+  :hook ((text-mode . ws-butler-mode)
+         (prog-mode . ws-butler-mode)))
+
+#+end_src
+
+* Line Settings
+
+#+begin_src emacs-lisp
+
+(column-number-mode)
+
+;; Enable line numbers for some modes
+(dolist (mode '(text-mode-hook
+                prog-mode-hook
+                conf-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 1))))
+
+;; Override some modes which derive from the above
+(dolist (mode '(org-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+(map! :leader
+      :desc "Comment or uncomment lines" "TAB TAB" #'comment-line
+      (:prefix ("t" . "toggle")
+       :desc "Toggle line numbers" "l" #'doom/toggle-line-numbers
+       :desc "Toggle line highlight in frame" "h" #'hl-line-mode
+       :desc "Toggle line highlight globally" "H" #'global-hl-line-mode
+       :desc "Toggle truncate lines" "t" #'toggle-truncate-lines))
+
+#+end_src
+
+* ModeLine
+
+#+begin_src emacs-lisp
+
+(setq doom-modeline-height 25     ;; sets modeline height
+      doom-modeline-bar-width 5   ;; sets right bar width
+      doom-modeline-persp-name t  ;; adds perspective name to modeline
+      doom-modeline-persp-icon t) ;; adds folder icon next to persp name
+
+#+end_src
+
+* Neotree
+
+#+begin_src emacs-lisp
+
+(after! neotree
+  (setq neo-smart-open t
+        neo-window-fixed-size nil))
+(after! doom-themes
+  (setq doom-neotree-enable-variable-pitch t))
+(doom-themes-neotree-config)
+(setq doom-themes-neotree-file-icons t)
+(map! :leader
+      :desc "Toggle neotree file viewer" "t n" #'neotree-toggle
+      :desc "Open directory in neotree" "d n" #'neotree-dir)
+
+#+end_src
+
+* Dired
+** Key Bindings
+
+*** Navigation
+
+*Emacs* / *Evil*
+- =n= / =j= - next line
+- =p= / =k= - previous line
+- =j= / =J= - jump to file in buffer
+- =RET= - select file or directory
+- =^= - go to parent directory
+- =S-RET= / =g O= - Open file in "other" window
+- =M-RET= - Show file in other window without focusing (previewing files)
+- =g o= (=dired-view-file=) - Open file but in a "preview" mode, close with =q=
+- =g= / =g r= Refresh the buffer with =revert-buffer= after changing configuration (and after filesystem changes!)
+
+*** Marking files
+
+- =m= - Marks a file
+- =u= - Unmarks a file
+- =U= - Unmarks all files in buffer
+- =* t= / =t= - Inverts marked files in buffer
+- =% m= - Mark files in buffer using regular expression
+- =*= - Lots of other auto-marking functions
+- =k= / =K= - "Kill" marked items (refresh buffer with =g= / =g r= to get them back)
+- Many operations can be done on a single file if there are no active marks!
+
+*** Copying and Renaming files
+
+- =C= - Copy marked files (or if no files are marked, the current file)
+- Copying single and multiple files
+- =U= - Unmark all files in buffer
+- =R= - Rename marked files, renaming multiple is a move!
+- =% R= - Rename based on regular expression: =^test= , =old-\&=
+
+*Power command*: =C-x C-q= (=dired-toggle-read-only=) - Makes all file names in the buffer editable directly to rename them!  Press =Z Z= to confirm renaming or =Z Q= to abort.
+
+*** Deleting files
+
+- =D= - Delete marked file
+- =d= - Mark file for deletion
+- =x= - Execute deletion for marks
+- =delete-by-moving-to-trash= - Move to trash instead of deleting permanently
+
+*** Creating and extracting archives
+
+- =Z= - Compress or uncompress a file or folder to (=.tar.gz=)
+- =c= - Compress selection to a specific file
+- =dired-compress-files-alist= - Bind compression commands to file extension
+
+*** Other common operations
+
+- =T= - Touch (change timestamp)
+- =M= - Change file mode
+- =O= - Change file owner
+- =G= - Change file group
+- =S= - Create a symbolic link to this file
+- =L= - Load an Emacs Lisp file into Emacs
+
+
+** Configuration
+
+#+begin_src emacs-lisp
+
+(map! :leader
+      (:prefix ("d" . "dired")
+       :desc "Open dired" "d" #'dired
+       :desc "Dired jump to current" "j" #'dired-jump)
+      (:after dired
+       (:map dired-mode-map
+        :desc "Peep-dired image previews" "d p" #'peep-dired
+        :desc "Dired view file" "d v" #'dired-view-file)))
+
+(evil-define-key 'normal dired-mode-map
+  (kbd "M-RET") 'dired-display-file
+  (kbd "RET") 'dired-single-buffer
+  (kbd "h") 'dired-single-up-directory
+  (kbd "H") 'dired-omit-mode
+  (kbd "l") 'dired-single-buffer
+  (kbd "y") 'dired-ranger-copy
+  (kbd "X") 'dired-ranger-move
+  (kbd "p") 'dired-ranger-paste)
+
+;; Get file icons in dired
+(add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
+;; With dired-open plugin, you can launch external programs for certain extensions
+;; For example, I set all .png files to open in 'sxiv' and all .mp4 files to open in 'mpv'
+(setq dired-open-extensions '(("gif" . "sxiv")
+                              ("jpg" . "sxiv")
+                              ("png" . "sxiv")
+                              ("mkv" . "mpv")
+                              ("mp4" . "mpv")))
+#+end_src
+
+** Opening Files Externally
+
+#+begin_src emacs-lisp
+
+(use-package openwith
+  :config
+  (setq openwith-associations
+        (list
+          (list (openwith-make-extension-regexp
+                '("mpg" "mpeg" "mp3" "mp4"
+                  "avi" "wmv" "wav" "mov" "flv"
+                  "ogm" "ogg" "mkv"))
+                "mpv"
+                '(file))
+          (list (openwith-make-extension-regexp
+                '("xbm" "pbm" "pgm" "ppm" "pnm"
+                  "png" "gif" "bmp" "tif" "jpeg")) ;; Removed jpg because Telega was
+                  ;; causing feh to be opened...
+                  "feh"
+                  '(file))
+          (list (openwith-make-extension-regexp
+                '("pdf"))
+                "zathura"
+                '(file)))))
+
+#+end_src
+
+** Bind
+
+
+#+begin_src emacs-lisp
+
+(map! :leader
+      (:prefix ("d" . "dired")
+       :desc "Open dired" "d" #'dired
+       :desc "Dired jump to current" "j" #'dired-jump)
+      (:after dired
+       (:map dired-mode-map
+        :desc "Peep-dired image previews" "d p" #'peep-dired
+        :desc "Dired view file" "d v" #'dired-view-file)))
+
+#+end_src
+
+** Making deleted files go to trash can
+#+begin_src emacs-lisp
+(setq delete-by-moving-to-trash t
+      trash-directory "~/.local/share/Trash/files/")
+#+end_src
+
+=NOTE=: For convenience, you may want to create a symlink to 'local/share/Trash' in your home directory:
+#+begin_example
+cd ~/
+ln -s ~/.local/share/Trash .
+#+end_example
+
+* EMOJIS
+Emojify is an Emacs extension to display emojis. It can display github style emojis like :smile: or plain ascii ones like :).
+
+#+begin_src emacs-lisp
+(use-package emojify
+  :hook (after-init . global-emojify-mode))
+#+end_src
+
+* IVY
+Ivy is a generic completion mechanism for Emacs.
+
+** IVY-POSFRAME
+Ivy-posframe is an ivy extension, which lets ivy use posframe to show its candidate menu.  Some of the settings below involve:
++ ivy-posframe-display-functions-alist -- sets the display position for specific programs
++ ivy-posframe-height-alist -- sets the height of the list displayed for specific programs
+
+Available functions (positions) for 'ivy-posframe-display-functions-alist'
++ ivy-posframe-display-at-frame-center
++ ivy-posframe-display-at-window-center
++ ivy-posframe-display-at-frame-bottom-left
++ ivy-posframe-display-at-window-bottom-left
++ ivy-posframe-display-at-frame-bottom-window-center
++ ivy-posframe-display-at-point
++ ivy-posframe-display-at-frame-top-center
+
+=NOTE:= If the setting for 'ivy-posframe-display' is set to 'nil' (false), anything that is set to 'ivy-display-function-fallback' will just default to their normal position in Doom Emacs (usually a bottom split).  However, if this is set to 't' (true), then the fallback position will be centered in the window.
+
+#+BEGIN_SRC emacs-lisp
+(setq ivy-posframe-display-functions-alist
+      '((swiper                     . ivy-posframe-display-at-point)
+        (complete-symbol            . ivy-posframe-display-at-point)
+        (counsel-M-x                . ivy-display-function-fallback)
+        (counsel-esh-history        . ivy-posframe-display-at-window-center)
+        (counsel-describe-function  . ivy-display-function-fallback)
+        (counsel-describe-variable  . ivy-display-function-fallback)
+        (counsel-find-file          . ivy-display-function-fallback)
+        (counsel-recentf            . ivy-display-function-fallback)
+        (counsel-register           . ivy-posframe-display-at-frame-bottom-window-center)
+        (dmenu                      . ivy-posframe-display-at-frame-top-center)
+        (nil                        . ivy-posframe-display))
+      ivy-posframe-height-alist
+      '((swiper . 20)
+        (dmenu . 20)
+        (t . 10)))
+(ivy-posframe-mode 1) ; 1 enables posframe-mode, 0 disables it.
+#+END_SRC
+
+** IVY KEYBINDINGS
+By default, Doom Emacs does not use 'SPC v', so the format I use for these bindings is 'SPC v' plus 'key'.
+
+#+BEGIN_SRC emacs-lisp
+(map! :leader
+      (:prefix ("v" . "Ivy")
+       :desc "Ivy push view" "v p" #'ivy-push-view
+       :desc "Ivy switch view" "v s" #'ivy-switch-view))
+#+END_SRC
+
+* LINE SETTINGS
+I set comment-line to 'SPC TAB TAB' which is a rather comfortable keybinding for me on my ZSA Moonlander keyboard.  The standard Emacs keybinding for comment-line is 'C-x C-;'.  The other keybindings are for commands that toggle on/off various line-related settings.  Doom Emacs uses 'SPC t' for "toggle" commands, so I choose 'SPC t' plus 'key' for those bindings.
+
+| COMMAND                  | DESCRIPTION                               | KEYBINDING  |
+|--------------------------+-------------------------------------------+-------------|
+| comment-line             | /Comment or uncomment lines/                | SPC TAB TAB |
+| hl-line-mode             | /Toggle line highlighting in current frame/ | SPC t h     |
+| global-hl-line-mode      | /Toggle line highlighting globally/         | SPC t H     |
+| doom/toggle-line-numbers | /Toggle line numbers/                       | SPC t l     |
+| toggle-truncate-lines    | /Toggle truncate lines/                     | SPC t t     |
+
+#+BEGIN_SRC emacs-lisp
+(setq display-line-numbers-type t)
+(map! :leader
+      :desc "Comment or uncomment lines"      "TAB TAB" #'comment-line
+      (:prefix ("t" . "toggle")
+       :desc "Toggle line numbers"            "l" #'doom/toggle-line-numbers
+       :desc "Toggle line highlight in frame" "h" #'hl-line-mode
+       :desc "Toggle line highlight globally" "H" #'global-hl-line-mode
+       :desc "Toggle truncate lines"          "t" #'toggle-truncate-lines))
+#+END_SRC
+
+* MARKDOWN
+
+#+begin_src emacs-lisp
+(custom-set-faces
+ '(markdown-header-face ((t (:inherit font-lock-function-name-face :weight bold :family "variable-pitch"))))
+ '(markdown-header-face-1 ((t (:inherit markdown-header-face :height 1.7))))
+ '(markdown-header-face-2 ((t (:inherit markdown-header-face :height 1.6))))
+ '(markdown-header-face-3 ((t (:inherit markdown-header-face :height 1.5))))
+ '(markdown-header-face-4 ((t (:inherit markdown-header-face :height 1.4))))
+ '(markdown-header-face-5 ((t (:inherit markdown-header-face :height 1.3))))
+ '(markdown-header-face-6 ((t (:inherit markdown-header-face :height 1.2)))))
+
+#+end_src
+
+* Set Margins for Modes
+
+#+begin_src emacs-lisp
+
+;;(defun apts/org-mode-visual-fill ()
+;;  (setq visual-fill-column-width 110
+;;        visual-fill-column-center-text t)
+;;  (visual-fill-column-mode 1))
+
+;;(defun apts/prog-mode-visual-fill ()
+;;  (setq visual-fill-column-width 200
+;;        visual-fill-column-center-text t)
+;;  (visual-fill-column-mode 1))
+
+;;(use-package visual-fill-column
+;;  :defer t
+;;  :hook (org-mode . apts/org-mode-visual-fill)
+;;  (prog-mode . apts/prog-mode-visual-fill))
+
+#+end_src
+
+* Org mode
+
+** Configuration
+
+#+begin_src emacs-lisp
+
+(map! :leader
+      :desc "Org babel tangle" "m B" #'org-babel-tangle)
+(after! org
+  (setq org-ellipsis " ▼ "
+        org-ellipsis " ▼ "
+        org-superstar-headline-bullets-list '("◉" "●" "○" "◆" "●" "○" "◆")
+        org-superstar-itembullet-alist '((?+ . ?➤) (?- . ?✦)) ; changes +/- symbols in item lists
+        org-log-done 'time
+        org-hide-emphasis-markers t
+        ;; ex. of org-link-abbrev-alist in action
+        ;; [[arch-wiki:Name_of_Page][Description]]
+        org-link-abbrev-alist    ; This overwrites the default Doom org-link-abbrev-list
+          '(("google" . "http://www.google.com/search?q=")
+            ("arch-wiki" . "https://wiki.archlinux.org/index.php/")
+            ("ddg" . "https://duckduckgo.com/?q=")
+            ("wiki" . "https://en.wikipedia.org/wiki/"))
+        org-table-convert-region-max-lines 20000
+        org-todo-keywords        ; This overwrites the default Doom org-todo-keywords
+          '((sequence
+             "TODO(t)"           ; A task that is ready to be tackled
+             "BLOG(b)"           ; Blog writing assignments
+             "GYM(g)"            ; Things to accomplish at the gym
+             "PROJ(p)"           ; A project that contains other tasks
+             "VIDEO(v)"          ; Video assignments
+             "WAIT(w)"           ; Something is holding up this task
+             "|"                 ; The pipe necessary to separate "active" states and "inactive" states
+             "DONE(d)"           ; Task has been completed
+             "CANCELLED(c)" )))) ; Task has been cancelled
+
+#+end_src
+
+** Set font sizes for each header level in Org
+
+#+begin_src emacs-lisp
+
+(custom-set-faces
+  '(org-level-1 ((t (:inherit outline-1 :height 1.2))))
+  '(org-level-2 ((t (:inherit outline-2 :height 1.1))))
+  '(org-level-3 ((t (:inherit outline-3 :height 1.05))))
+  '(org-level-4 ((t (:inherit outline-4 :height 1.0))))
+  '(org-level-5 ((t (:inherit outline-5 :height 1.1))))
+  '(org-level-6 ((t (:inherit outline-6 :height 1.1))))
+  '(org-level-7 ((t (:inherit outline-7 :height 1.1))))
+  '(org-level-8 ((t (:inherit outline-8 :height 1.1))))
+)
+
+;; Make sure org-indent face is available
+(require 'org-indent)
+
+;; Ensure that anything that should be fixed-pitch in Org files appears that way
+(set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+(set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
+(set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+(set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+(set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
+(set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+(set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+(set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+(set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+
+;; Get rid of the background on column views
+(set-face-attribute 'org-column nil :background nil)
+(set-face-attribute 'org-column-title nil :background nil)
+
+#+end_src
+
+
+** Org-export
+
+#+begin_src emacs-lisp
+
+(use-package ox-man)
+(use-package ox-gemini)
+
+#+end_src
+
+** Org publish
+
+#+begin_src emacs-lisp
+
+(setq org-html-validation-link nil)
+
+;; Define the publishing project
+(setq org-publish-project-alist
+      (list
+       (list "org-site:main"
+             :recursive t
+             ;; Start org publish comman if you are in org files directory
+             ;; or change base directory
+             :base-directory "./"
+             :publishing-function 'org-html-publish-to-html
+             :publishing-directory "./../public"
+             :with-author nil           ;; Don't include author name
+             :with-creator t            ;; Include Emacs and Org versions in footer
+             :with-toc t                ;; Include a table of contents
+             :section-numbers nil       ;; Don't include section numbers
+             :time-stamp-file nil)))    ;; Don't include time stamp in file
+
+;; Customize the HTML output
+(setq org-html-validation-link nil            ;; Don't show validation link
+      org-html-head-include-scripts nil       ;; Use our own scripts
+      org-html-head-include-default-style nil ;; Use our own styles
+
+      ;; if you want use simplecss with nice and clean output
+      ;; org-html-head "<link rel=\"stylesheet\" href=\"https://cdn.simplecss.org/simple.min.css\" />"
+
+      ;; if you want use custom css
+      ;; org-html-head "<link rel=\"stylesheet\" href=\"css/main.css\" />"
+
+      )
+
+;; If You wants use light theme go into main.css and uncomment html dark theme section (marked with comment)
+
+(defun apts/org-inline-css-hook (exporter)
+  "Insert custom inline css"
+  (when (eq exporter 'html)
+    (let* ((dir (ignore-errors (file-name-directory (buffer-file-name))))
+           (path (concat dir "style.css"))
+           (homestyle (or (null dir) (null (file-exists-p path))))
+           (final (if homestyle "~/.config/doom/org-publish/css/main.css" path))) ;; <- set your own style file path
+      (setq org-html-head-include-default-style nil)
+      (setq org-html-head (concat
+                           "<style type=\"text/css\">\n"
+                           "<!--/*--><![CDATA[/*><!--*/\n"
+                           (with-temp-buffer
+                             (insert-file-contents final)
+                             (buffer-string))
+                           "/*]]>*/-->\n"
+                           "</style>\n")))))
+
+(add-hook 'org-export-before-processing-hook 'apts/org-inline-css-hook)
+
+
+#+end_src
+
+** Org-auto-tangle
+
+#+begin_src emacs-lisp
+
+(use-package! org-auto-tangle
+  :defer t
+  :hook (org-mode . org-auto-tangle-mode)
+  :config
+  (setq org-auto-tangle-default t))
+
+#+end_src
+
+** Org tempo
+
+#+begin_src emacs-lisp
+
+(with-eval-after-load 'org
+  ;; This is needed as of Org 9.2
+  (require 'org-tempo)
+
+  (add-to-list 'org-structure-template-alist '("sh" . "src sh"))
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist '("sc" . "src scheme"))
+  (add-to-list 'org-structure-template-alist '("ts" . "src typescript"))
+  (add-to-list 'org-structure-template-alist '("py" . "src python"))
+  (add-to-list 'org-structure-template-alist '("go" . "src go"))
+  (add-to-list 'org-structure-template-alist '("php" . "src php"))
+  (add-to-list 'org-structure-template-alist '("html" . "src html"))
+  (add-to-list 'org-structure-template-alist '("yaml" . "src yaml"))
+  (add-to-list 'org-structure-template-alist '("json" . "src json")))
+
+#+end_src
+
+** Org tree slide
+
+#+begin_src emacs-lisp
+
+ (defun apts/org-start-presentation ()
+  (interactive)
+  (org-tree-slide-mode 1)
+  (setq text-scale-mode-amount 3)
+  (text-scale-mode 1))
+
+(defun apts/org-end-presentation ()
+  (interactive)
+  (text-scale-mode 0)
+  (org-tree-slide-mode 0))
+
+(use-package org-tree-slide
+  :defer t
+  :after org
+  :commands org-tree-slide-mode
+  :config
+  (evil-define-key 'normal org-tree-slide-mode-map
+    (kbd "q") 'apts/org-end-presentation
+    (kbd "C-j") 'org-tree-slide-move-next-tree
+    (kbd "C-k") 'org-tree-slide-move-previous-tree)
+  (setq org-tree-slide-slide-in-effect nil
+        org-tree-slide-activate-message "Presentation started."
+        org-tree-slide-deactivate-message "Presentation ended."
+        org-tree-slide-header t))
+
+#+end_src
+
+* Rainbow Mode
+
+#+begin_src emacs-lisp
+
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
+
+(define-globalized-minor-mode global-rainbow-mode rainbow-mode
+  (lambda () (rainbow-mode 1)))
+(global-rainbow-mode 1 )
+
+#+end_src
+
+* Shell
+
+#+begin_src emacs-lisp
+
+(setq shell-file-name "/bin/bash"
+      vterm-max-scrollback 5000)
+(setq eshell-rc-script "~/.config/doom/eshell/profile"
+      eshell-aliases-file "~/.config/doom/eshell/aliases"
+      eshell-history-size 5000
+      eshell-buffer-maximum-lines 5000
+      eshell-hist-ignoredups t
+      eshell-scroll-to-bottom-on-input t
+      eshell-destroy-buffer-when-process-dies t
+      eshell-visual-commands'("bash" "htop" "ssh" "top" "zsh"))
+(map! :leader
+      :desc "Eshell" "e s" #'eshell
+      :desc "Eshell popup toggle" "e t" #'+eshell/toggle
+      :desc "Counsel eshell history" "e h" #'counsel-esh-history
+      :desc "Vterm popup toggle" "v t" #'+vterm/toggle)
+
+#+end_src
+
+* Splits
+
+I set splits to default to opening on the right using ‘prefer-horizontal-split’.  I set a keybinding for ‘clone-indirect-buffer-other-window’ for when I want to have the same document in two splits.  The text of the indirect buffer is always identical to the text of its base buffer; changes made by editing either one are visible immediately in the other.  But in all other respects, the indirect buffer and its base buffer are completely separate.  For example, I can fold one split but other will be unfolded.
+
+#+begin_src emacs-lisp
+
+(defun prefer-horizontal-split ()
+  (set-variable 'split-height-threshold nil t)
+  (set-variable 'split-width-threshold 40 t)) ; make this as low as needed
+(add-hook 'markdown-mode-hook 'prefer-horizontal-split)
+(map! :leader
+      :desc "Clone indirect buffer other window" "b c" #'clone-indirect-buffer-other-window)
+
+#+end_src
+
+* Winner mode
+
+Winner mode has been included with GNU Emacs since version 20.  This is a global minor mode and, when activated, it allows you to “undo” (and “redo”) changes in the window configuration with the key commands ‘SCP w <left>’ and ‘SPC w <right>’.
+
+#+begin_src emacs-lisp
+
+(map! :leader
+      (:prefix ("w" . "window")
+       :desc "Winner redo" "<right>" #'winner-redo
+       :desc "Winner undo" "<left>" #'winner-undo))
+
+#+end_src
