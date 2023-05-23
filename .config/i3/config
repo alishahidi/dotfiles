@@ -173,7 +173,7 @@ exec xautolock -detectsleep -time 15 -locker "$HOME/.config/scripts/blur-lock" \
 
 ################# applications keyboard shortcuts  
 
-bindsym $mod+Return exec --no-startup-id alacritty;focus
+bindsym $mod+Return exec --no-startup-id kitty;focus
 bindsym $mod+Shift+Return exec emacsclient -c -a 'emacs';focus
 bindsym mod1+Shift+Delete exec --no-startup-id xfce4-taskmanager;focus
 bindsym $mod+Shift+s exec --no-startup-id xfce4-settings-manager
