@@ -3,25 +3,25 @@ font:
   normal:
     
     Default:
-    family: "fantasque sans mono Nerd Font"
+    family: "FantasqueSansM Nerd Font Mono"
     style: Regular
 
   bold:
-    family: "fantasque sans mono Nerd Font"
+    family: "FantasqueSansM Nerd Font Mono"
 
     style: Bold
   italic:
     
-    family: "fantasque sans mono Nerd Font"
+    family: "FantasqueSansM Nerd Font Mono"
 
     style: Italic
 
   bold_italic:
     
-    family: "fantasque sans mono Nerd Font"
+    family: "FantasqueSansM Nerd Font Mono"
 
     style: Bold Italic
-  size: 13.8
+  size: 14.8
 
 env:
   TERM: alacritty

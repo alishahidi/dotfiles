@@ -150,10 +150,12 @@ font pango:Inconsolata Nerd Font Bold 13
 
 ################# autostart - execute applications at boot time
 
+exec_always --no-startup-id xrandr --output eDP --mode 1920x1080 --output HDMI-A-0 --mode 1920x1080 --left-of eDP &
 exec_always --no-startup-id ~/.config/scripts/autotiling
 exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 exec --no-startup-id pamac-tray
 exec --no-startup-id blueberry-tray
+exec --no-startup-id /usr/bin/emacs --daemon
 exec --no-startup-id nm-applet
 exec_always --no-startup-id numlockx on
 exec --no-startup-id volumeicon
@@ -164,6 +166,9 @@ exec cbatticon
 exec diskie -t
 exec xfce4-clipman
 exec --no-startup-id xfce4-power-manager &
+exec --no-startup-id xset +fp /usr/share/fonts/local/ &
+exec --no-startup-id xset -fp /usr/share/fonts/sucky_fonts/ &
+exec --no-startup-id xsettingsd &
 exec --no-startup-id /usr/lib/xfce4/notifyd/xfce4-notifyd &
 exec_always feh --bg-fill --randomize ~/Pictures/Wallpapers
 
@@ -173,7 +178,7 @@ exec xautolock -detectsleep -time 15 -locker "$HOME/.config/scripts/blur-lock" \
 
 ################# applications keyboard shortcuts  
 
-bindsym $mod+Return exec --no-startup-id kitty;focus
+bindsym $mod+Return exec --no-startup-id alacritty;focus
 bindsym $mod+Shift+Return exec emacsclient -c -a 'emacs';focus
 bindsym mod1+Shift+Delete exec --no-startup-id xfce4-taskmanager;focus
 bindsym $mod+Shift+s exec --no-startup-id xfce4-settings-manager
@@ -344,25 +349,23 @@ bar {
     workspace_buttons yes
 
   colors {
-    background $background
-    statusline $color15
-    separator  #16A085
+    background #282A36
+    statusline #F8F8F2
+    separator  #44475A
 
-    focused_workspace  #16A085 #16A085 $color15
-    active_workspace   $background #16A085 $color15
-    inactive_workspace $background $background $color1
-    urgent_workspace   #16A085 #16A085 $color15
-    binding_mode       #16A085 #16A085 $color15
+    focused_workspace  #44475A #44475A #F8F8F2
+    active_workspace   #282A36 #44475A #F8F8F2
+    inactive_workspace #282A36 #282A36 #BFBFBF
+    urgent_workspace   #FF5555 #FF5555 #F8F8F2
+    binding_mode       #FF5555 #FF5555 #F8F8F2
   }
 }
 
-# Theme colors
-# class                 border  	backgr. 	text    	indic.  	child_border
-# My colors
-client.background	$background
+# class                 border  bground text    indicator child_border
+client.focused          #6272A4 #6272A4 #F8F8F2 #6272A4   #6272A4
+client.focused_inactive #44475A #44475A #F8F8F2 #44475A   #44475A
+client.unfocused        #282A36 #282A36 #BFBFBF #282A36   #282A36
+client.urgent           #44475A #FF5555 #F8F8F2 #FF5555   #FF5555
+client.placeholder      #282A36 #282A36 #F8F8F2 #282A36   #282A36
 
-client.focused         	$foreground	$background	$foreground	$background		$background	
-client.unfocused       	$foreground	$background	$foreground	$background		$background
-client.focused_inactive	$foreground	$background	$foreground	$background		$background
-client.urgent		        $foreground	$background	$foreground	$background		$background
-client.placeholder	    $foreground	$background	$foreground	$background		$background
+client.background       #F8F8F2

@@ -54,6 +54,10 @@ if [ -d /etc/X11/xinit/xinitrc.d ] ; then
  unset f
 fi
 
+#xset +fp /usr/share/fonts/local/   &        # Prepend a custom font path to Xorg's list of known font paths
+#xset -fp /usr/share/fonts/sucky_fonts/ &    # Remove the specified font path from Xorg's list of known font paths
+#xsettingsd &
+
 setxkbmap -layout us,ir
 setxkbmap -option 'grp:alt_shift_toggle'
 exec i3
